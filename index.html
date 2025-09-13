@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bus Seating Chart Maker</title>
+  <meta name="description" content="Design and print bus seating charts" />
+
+  <!-- Tailwind CSS (CDN) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link rel="stylesheet" href="./assets/styles.css" />
+</head>
+<body class="bg-slate-100 text-slate-900">
+  <!-- Main grid layout -->
+  <div class="min-h-dvh grid grid-cols-1 lg:grid-cols-[320px_1fr]">
+    <!-- Sidebar: navigation and controls -->
+    <aside class="no-print bg-white border-r border-slate-200 p-4 space-y-4" aria-label="Sidebar">
+      <header>
+        <h1 class="text-xl font-bold" aria-label="Bus Seating Chart Title">🪑 Bus Seating Chart</h1>
+      </header>
+
+      <!-- Layout Controls (rows only for bench layout) -->
+      <section class="space-y-2" aria-labelledby="layout-heading">
+        <h2 id="layout-heading" class="font-semibold">Layout</h2>
+        <form aria-label="Layout controls">
+          <div class="grid grid-cols-2 gap-2">
+            <label class="text-sm col-span-2" for="rows">Rows
+              <input id="rows" name="rows" type="number" min="1" value="13" class="w-full mt-1 border rounded px-2 py-1" aria-label="Number of rows" />
+            </label>
+          </div>
+          <p class="text-xs text-slate-500">Bench layout uses 2 benches per row with 3 seats per side (A/B/C). Aisle is fixed.</p>
+          <button id="applyLayout" type="button" class="mt-2 w-full bg-blue-600 text-white rounded px-3 py-2 hover:bg-blue-500 active:scale-[.99] transition" aria-label="Apply layout">Apply Layout</button>
+        </form>
+      </section>
+
+      <!-- Roster Input -->
+      <section id="roster-input" class="space-y-2" aria-labelledby="roster-heading">
+        <h2 id="roster-heading" class="font-semibold">Roster</h2>
+        <nav aria-label="Roster input tabs" class="flex border-b border-slate-200">
+          <button class="tab-button active px-3 py-2 text-sm" data-tab="upload-csv" aria-controls="upload-csv">Upload CSV</button>
+          <button class="tab-button px-3 py-2 text-sm" data-tab="add-manual" aria-controls="add-manual">Add Manually</button>
+        </nav>
+        <div id="upload-csv" class="tab-content space-y-2" role="tabpanel" aria-labelledby="upload-csv-tab">
+          <p class="text-xs text-slate-600">CSV format: <code>Student ID,Last Name,First Name,Grade</code></p>
+          <label for="csv-file" class="text-sm">Upload CSV</label>
+          <input type="file" id="csv-file" accept=".csv" class="w-full border rounded px-2 py-1" aria-label="Upload CSV" />
+        </div>
+        <div id="add-manual" class="tab-content hidden" role="tabpanel" aria-labelledby="add-manual-tab">
+          <form id="add-student-form" class="space-y-2" aria-label="Add student manually">
+            <label for="student-id">Student ID (optional)
+              <input type="text" id="student-id" name="student-id" placeholder="Student ID (optional)" class="w-full border rounded px-2 py-1" />
+            </label>
+            <label for="first-name">First Name
+              <input type="text" id="first-name" name="first-name" placeholder="First Name" required class="w-full border rounded px-2 py-1" />
+            </label>
+            <label for="last-name">Last Name
+              <input type="text" id="last-name" name="last-name" placeholder="Last Name" required class="w-full border rounded px-2 py-1" />
+            </label>
+            <label for="grade">Grade
+              <input type="text" id="grade" name="grade" placeholder="Grade (e.g., PK, KG, 01)" required class="w-full border rounded px-2 py-1" />
+            </label>
+            <button type="submit" class="w-full bg-emerald-600 text-white rounded px-3 py-2 hover:bg-emerald-500 active:scale-[.99] transition" aria-label="Add student">Add Student</button>
+          </form>
+        </div>
+      </section>
+
+      <!-- Unassigned List -->
+      <section class="space-y-2 min-h-40 flex flex-col" aria-labelledby="unassigned-heading">
+        <h3 id="unassigned-heading" class="text-sm font-medium">Unassigned Students</h3>
+        <ul id="unassignedList" class="min-h-24 bg-slate-50 border border-slate-200 rounded p-2 space-y-1 flex-1 overflow-auto" aria-label="Unassigned students list"></ul>
+      </section>
+
+      <!-- Grade Color Legend -->
+      <section class="space-y-2" aria-labelledby="grade-legend-heading">
+        <h2 id="grade-legend-heading" class="font-semibold">Grade Color Legend</h2>
+        <form id="grade-color-legend" class="grid grid-cols-2 gap-2 text-sm" aria-label="Grade color legend">
+          <label for="color-pk">PK <input id="color-pk" type="color" name="PK" value="#FFD966" /></label>
+          <label for="color-kg">KG <input id="color-kg" type="color" name="KG" value="#C9DAF8" /></label>
+          <label for="color-01">01 <input id="color-01" type="color" name="01" value="#D9EAD3" /></label>
+          <label for="color-02">02 <input id="color-02" type="color" name="02" value="#F4CCCC" /></label>
+          <label for="color-03">03 <input id="color-03" type="color" name="03" value="#EAD1DC" /></label>
+          <label for="color-04">04 <input id="color-04" type="color" name="04" value="#FFF2CC" /></label>
+          <label for="color-05">05 <input id="color-05" type="color" name="05" value="#D0E0E3" /></label>
+          <label for="color-06">06 <input id="color-06" type="color" name="06" value="#FDE68A" /></label>
+          <label for="color-07">07 <input id="color-07" type="color" name="07" value="#A7F3D0" /></label>
+          <label for="color-08">08 <input id="color-08" type="color" name="08" value="#FCA5A5" /></label>
+          <label for="color-09">09 <input id="color-09" type="color" name="09" value="#C4B5FD" /></label>
+          <label for="color-10">10 <input id="color-10" type="color" name="10" value="#FBCFE8" /></label>
+          <label for="color-11">11 <input id="color-11" type="color" name="11" value="#F9A8D4" /></label>
+          <label for="color-12">12 <input id="color-12" type="color" name="12" value="#A3E635" /></label>
+        </form>
+        <p class="text-xs text-slate-500">Click a color to change how seats are highlighted for each grade.</p>
+      </section>
+    </aside>
+
+    <!-- Main content -->
+    <main class="p-4" aria-label="Main content">
+      <div class="max-w-6xl mx-auto">
+        <!-- Title & Meta -->
+        <header class="no-print flex items-center justify-between mb-4">
+          <div>
+            <h2 class="text-2xl font-semibold">Current Bus Layout</h2>
+            <p id="meta" class="text-sm text-slate-600">8 rows × 4 seats/row • Aisle: yes</p>
+          </div>
+          <div class="text-sm text-slate-600">Last saved: <span id="lastSaved">never</span></div>
+        </header>
+
+        <!-- Chart Controls -->
+        <section class="no-print flex items-center justify-between bg-white rounded shadow-sm border p-3 mb-3" aria-label="Chart controls">
+          <div class="flex items-center gap-2">
+            <label class="text-sm" for="theme-selector">Theme</label>
+            <select id="theme-selector" class="border rounded px-2 py-1 text-sm" aria-label="Theme selector"></select>
+          </div>
+          <div class="flex items-center gap-2">
+            <button class="print-btn bg-emerald-600 text-white rounded px-3 py-2 hover:bg-emerald-500 active:scale-[.99] transition disabled:opacity-50" id="print-chart-btn" disabled aria-label="Print seating chart">Print Chart</button>
+            <button class="print-btn bg-emerald-600 text-white rounded px-3 py-2 hover:bg-emerald-500 active:scale-[.99] transition disabled:opacity-50" id="print-tags-btn" disabled aria-label="Print name tags">Print Tags</button>
+            <button class="print-btn bg-emerald-700 text-white rounded px-3 py-2 hover:bg-emerald-600 active:scale-[.99] transition disabled:opacity-50" id="print-icons-btn" disabled aria-label="Print bench icons">Print Bench Icons</button>
+          </div>
+        </section>
+
+        <!-- Seating Chart (table bench layout) -->
+        <section id="seating-chart-container" class="bg-white p-4 rounded shadow-sm print:shadow-none border border-transparent overflow-auto" aria-label="Seating chart">
+          <table id="seating-chart" class="w-full border-collapse" aria-label="Bus seating chart"></table>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Utility functions (must come before app.js) -->
+  <script src="./src/utils.js"></script>
+  <!-- Themes script (must come before app.js) -->
+  <script src="./src/themes.js"></script>
+  <!-- Modularized logic -->
+  <script src="./src/roster.js"></script>
+  <script src="./src/seatingChart.js"></script>
+  <script src="./src/dragdrop.js"></script>
+  <script src="./src/modal.js"></script>
+  <script src="./src/gradeColors.js"></script>
+  <!-- App script -->
+  <script src="./src/app.js"></script>
+  <!-- Simple modal root for pickers -->
+  <div id="modal-root" class="no-print modal-root">
+    <div id="modal-backdrop" class="modal-backdrop"></div>
+    <div id="modal-panel" class="modal-panel">
+      <div id="modal-content"></div>
+    </div>
+  </div>
+</body>
+</html>

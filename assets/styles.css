@@ -1,0 +1,107 @@
+/* Basic tweaks beyond Tailwind and print styles */
+/* Bench table layout overrides */
+#seating-chart {
+  border-collapse: collapse;
+  width: 100%;
+}
+#seating-chart th, #seating-chart td {
+  border: 1px solid #e5e7eb; /* slate-200 */
+  text-align: center;
+  padding: 0.5rem;
+  min-width: 88px;
+  font-size: 0.875rem; /* text-sm */
+  vertical-align: middle;
+  background-color: #ffffff; /* ensure a consistent base in light mode */
+  color: #0f172a; /* slate-900 */
+}
+#seating-chart th { background-color: #f1f5f9; /* slate-100 */ }
+.bench-label { font-weight: 600; background-color: #f1f5f9; }
+.aisle { background-color: #e2e8f0; font-weight: 600; }
+.seat.empty:hover { background-color: #e2fbe8; cursor: pointer; }
+.seat.empty.drag-over { outline: 2px dashed #22c55e; outline-offset: -4px; background-color: #ecfdf5; }
+/* Also show drag-over for occupied to highlight swap/replace */
+.seat.drag-over { outline: 2px dashed #22c55e; outline-offset: -4px; }
+
+/* Draggable affordances (handle icon on hover) */
+.seat { position: relative; }
+.seat[draggable="true"]:hover { cursor: grab; }
+.seat[draggable="true"]:active { cursor: grabbing; }
+#unassignedList li { position: relative; }
+#unassignedList li:active { cursor: grabbing; }
+
+/* SVG grip-dot handle (2x3) */
+.seat[draggable="true"]::after,
+#unassignedList li[draggable="true"]::after {
+  content: "";
+  position: absolute;
+  top: 6px; right: 6px;
+  width: 14px; height: 14px;
+  background-repeat: no-repeat;
+  background-size: 14px 14px;
+  opacity: 0; transition: opacity .15s ease-in-out;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 12 12' fill='none'%3E%3Ccircle cx='2' cy='2' r='1.5' fill='%2364748b'/%3E%3Ccircle cx='2' cy='6' r='1.5' fill='%2364748b'/%3E%3Ccircle cx='2' cy='10' r='1.5' fill='%2364748b'/%3E%3Ccircle cx='6' cy='2' r='1.5' fill='%2364748b'/%3E%3Ccircle cx='6' cy='6' r='1.5' fill='%2364748b'/%3E%3Ccircle cx='6' cy='10' r='1.5' fill='%2364748b'/%3E%3C/svg%3E");
+}
+.seat[draggable="true"]:hover::after,
+#unassignedList li[draggable="true"]:hover::after { opacity: .6; }
+
+@media print {
+  .seat[draggable="true"]::after,
+  #unassignedList li[draggable="true"]::after { display: none !important; }
+}
+.seat-content { font-size: 0.9em; }
+.bench-wrap { display: grid; grid-template-columns: 40px 1fr; align-items: center; gap: 6px; }
+.bench-icon { font-size: 22pt; line-height: 1; }
+.bench-title { font-weight: 700; }
+.bench-name { font-size: 0.85em; color: #334155; }
+.seat-grade { font-style: italic; font-size: 0.8em; }
+/* Seat technical IDs hidden in UI; keep (Empty) readable */
+.seat.empty .seat-content { color: #334155; }
+/* Grade badge visual */
+.grade-badge { display: inline-block; padding: 2px 6px; border-radius: 9999px; font-weight: 700; }
+.dark .grade-badge { color: #0b1220; }
+
+/* Zebra striping for readability */
+#seating-chart tbody tr:nth-child(odd) td { background-color: #f8fafc; }
+#seating-chart tbody tr:nth-child(odd) td.bench-label { background-color: #f3f4f6; }
+
+/* Rounded table corners */
+#seating-chart { border-radius: 8px; overflow: hidden; }
+
+/* Unassigned list items draggable affordance */
+#unassignedList li { cursor: grab; }
+#unassignedList li:active { cursor: grabbing; }
+#unassignedList li { background: #ffffff; border: 1px solid #e2e8f0; padding: 6px 8px; border-radius: 8px; display: flex; align-items: center; gap: 8px; }
+#unassignedList li .avatar { width: 28px; height: 28px; border-radius: 9999px; background: #e2e8f0; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; color: #475569; }
+#unassignedList li .badge { margin-left: auto; font-size: 0.7em; background: #e2e8f0; color: #334155; padding: 2px 6px; border-radius: 9999px; }
+/* Drag-over visualization when dropping a seat back into roster */
+#unassignedList.drag-over { outline: 2px dashed #22c55e; outline-offset: 2px; background: #ecfdf5; }
+
+/* Dark mode removed for now to keep readability consistent */
+
+@media print {
+  @page { margin: 12mm; }
+  .no-print { display: none !important; }
+  body { background: white; }
+  #seating-chart th, #seating-chart td { border-color: #94a3b8 !important; }
+}
+
+/* Print tags helpers (used in popup window inline too) */
+.print-tags-table { width: 100%; border-collapse: collapse; }
+.print-tags-table td { width: 50%; height: 2in; text-align: center; vertical-align: middle; border: 1px dashed #ccc; padding: 10px; box-sizing: border-box; }
+.tag-name { font-size: 24pt; font-weight: bold; }
+.tag-info { font-size: 14pt; }
+.tag-seat { font-size: 16pt; font-weight: bold; }
+
+/* Bus outline wrapper (top-down bus frame) */
+
+/* Modal styles */
+.modal-root { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; }
+.modal-root.show { display: flex; }
+.modal-backdrop { position: absolute; inset: 0; background: rgba(15, 23, 42, 0.5); }
+.modal-panel { position: relative; background: #fff; border-radius: 10px; width: min(560px, 92vw); max-height: 80vh; overflow: auto; box-shadow: 0 10px 30px rgba(2,6,23,.2); padding: 16px; }
+.modal-title { font-weight: 700; margin-bottom: 8px; }
+.modal-list { display: grid; grid-template-columns: 1fr; gap: 8px; max-height: 60vh; overflow: auto; }
+.modal-list button { text-align: left; padding: 8px 10px; border: 1px solid #e2e8f0; border-radius: 8px; background: #fff; cursor: pointer; }
+.modal-list button:hover { background: #f8fafc; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
+
