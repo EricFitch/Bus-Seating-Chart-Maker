@@ -56,6 +56,16 @@
     transform: scale(0.98);
     transition: all 0.1s ease;
   }
+
+  /* Mobile sidebar layout optimization */
+  aside {
+    gap: 1rem;
+  }
+  
+  /* Mobile theme controls layout */
+  #theme-selector {
+    min-width: 0;
+  }
 }
 
 /* Draggable affordances (handle icon on hover) */

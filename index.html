@@ -15,13 +15,13 @@
   <!-- Main grid layout -->
   <div class="min-h-dvh flex flex-col lg:grid lg:grid-cols-[320px_1fr]">
     <!-- Sidebar: navigation and controls -->
-    <aside class="no-print bg-white border-b lg:border-r lg:border-b-0 border-slate-200 p-2 lg:p-4 space-y-2 lg:space-y-4 order-2 lg:order-1" aria-label="Sidebar">
-      <header>
+    <aside class="no-print bg-white border-b lg:border-r lg:border-b-0 border-slate-200 p-2 lg:p-4 flex flex-col space-y-2 lg:space-y-4 order-2 lg:order-1" aria-label="Sidebar">
+      <header class="order-0">
         <h1 class="text-lg lg:text-xl font-bold" aria-label="Bus Seating Chart Title">🪑 Bus Seating Chart</h1>
       </header>
 
       <!-- Layout Controls (rows only for bench layout) -->
-      <section class="space-y-2" aria-labelledby="layout-heading">
+      <section class="space-y-2 order-1" aria-labelledby="layout-heading">
         <h2 id="layout-heading" class="font-semibold">Layout</h2>
         <form aria-label="Layout controls">
           <div class="grid grid-cols-2 gap-2">
@@ -35,7 +35,7 @@
       </section>
 
       <!-- Roster Input -->
-      <section id="roster-input" class="space-y-2" aria-labelledby="roster-heading">
+      <section id="roster-input" class="space-y-2 order-2" aria-labelledby="roster-heading">
         <h2 id="roster-heading" class="font-semibold">Roster</h2>
         <nav aria-label="Roster input tabs" class="flex border-b border-slate-200">
           <button class="tab-button active px-3 py-2 text-sm" data-tab="upload-csv" aria-controls="upload-csv">Upload CSV</button>
@@ -66,13 +66,38 @@
       </section>
 
       <!-- Unassigned List -->
-      <section class="space-y-2 min-h-40 flex flex-col" aria-labelledby="unassigned-heading">
+      <section class="space-y-2 min-h-40 flex flex-col order-2" aria-labelledby="unassigned-heading">
         <h3 id="unassigned-heading" class="text-sm font-medium">Unassigned Students</h3>
         <ul id="unassignedList" class="min-h-24 bg-slate-50 border border-slate-200 rounded p-2 space-y-1 flex-1 overflow-auto" aria-label="Unassigned students list"></ul>
       </section>
 
+      <!-- Mobile Usage Instructions -->
+      <section class="lg:hidden bg-blue-50 border border-blue-200 rounded p-3 text-sm space-y-1 order-3" aria-labelledby="mobile-instructions-heading">
+        <h3 id="mobile-instructions-heading" class="font-medium text-blue-900">📱 Mobile Instructions</h3>
+        <p class="text-blue-800">• Tap students in the roster to assign them to the first available seat</p>
+        <p class="text-blue-800">• Tap empty seats to choose a student to assign</p>
+        <p class="text-blue-800">• Tap occupied seats to remove the student</p>
+        <p class="text-blue-800">• Scroll the seating chart horizontally if needed</p>
+      </section>
+
+      <!-- Theme Controls -->
+      <section class="no-print space-y-2 order-4" aria-labelledby="theme-heading">
+        <h2 id="theme-heading" class="font-semibold">Theme & Print</h2>
+        <div class="space-y-3">
+          <div class="flex items-center gap-2">
+            <label class="text-sm" for="theme-selector">Theme</label>
+            <select id="theme-selector" class="border rounded px-2 py-1 text-sm flex-1" aria-label="Theme selector"></select>
+          </div>
+          <div class="flex flex-col gap-2">
+            <button class="print-btn bg-emerald-600 text-white rounded px-3 py-2 hover:bg-emerald-500 active:scale-[.99] transition disabled:opacity-50 text-sm touch-manipulation" id="print-chart-btn" disabled aria-label="Print seating chart">Print Chart</button>
+            <button class="print-btn bg-emerald-600 text-white rounded px-3 py-2 hover:bg-emerald-500 active:scale-[.99] transition disabled:opacity-50 text-sm touch-manipulation" id="print-tags-btn" disabled aria-label="Print name tags">Print Tags</button>
+            <button class="print-btn bg-emerald-700 text-white rounded px-3 py-2 hover:bg-emerald-600 active:scale-[.99] transition disabled:opacity-50 text-sm touch-manipulation" id="print-icons-btn" disabled aria-label="Print bench icons">Print Bench Icons</button>
+          </div>
+        </div>
+      </section>
+
       <!-- Grade Color Legend -->
-      <section class="space-y-2" aria-labelledby="grade-legend-heading">
+      <section class="space-y-2 order-5" aria-labelledby="grade-legend-heading">
         <h2 id="grade-legend-heading" class="font-semibold">Grade Color Legend</h2>
         <form id="grade-color-legend" class="grid grid-cols-2 gap-2 text-sm" aria-label="Grade color legend">
           <label for="color-pk">PK <input id="color-pk" type="color" name="PK" value="#FFD966" /></label>
@@ -105,28 +130,6 @@
           </div>
           <div class="text-sm text-slate-600">Last saved: <span id="lastSaved">never</span></div>
         </header>
-
-        <!-- Chart Controls -->
-        <section class="no-print flex flex-col lg:flex-row lg:items-center justify-between bg-white rounded shadow-sm border p-3 mb-3 gap-3" aria-label="Chart controls">
-          <div class="flex items-center gap-2">
-            <label class="text-sm" for="theme-selector">Theme</label>
-            <select id="theme-selector" class="border rounded px-2 py-1 text-sm flex-1 lg:flex-none" aria-label="Theme selector"></select>
-          </div>
-          <div class="flex flex-wrap items-center gap-2">
-            <button class="print-btn bg-emerald-600 text-white rounded px-3 py-2 hover:bg-emerald-500 active:scale-[.99] transition disabled:opacity-50 text-sm touch-manipulation" id="print-chart-btn" disabled aria-label="Print seating chart">Print Chart</button>
-            <button class="print-btn bg-emerald-600 text-white rounded px-3 py-2 hover:bg-emerald-500 active:scale-[.99] transition disabled:opacity-50 text-sm touch-manipulation" id="print-tags-btn" disabled aria-label="Print name tags">Print Tags</button>
-            <button class="print-btn bg-emerald-700 text-white rounded px-3 py-2 hover:bg-emerald-600 active:scale-[.99] transition disabled:opacity-50 text-sm touch-manipulation" id="print-icons-btn" disabled aria-label="Print bench icons">Print Bench Icons</button>
-          </div>
-        </section>
-
-        <!-- Mobile Usage Instructions -->
-        <div class="lg:hidden bg-blue-50 border border-blue-200 rounded p-3 mb-3 text-sm">
-          <h3 class="font-medium text-blue-900 mb-1">📱 Mobile Instructions</h3>
-          <p class="text-blue-800">• Tap students in the roster to assign them to the first available seat</p>
-          <p class="text-blue-800">• Tap empty seats to choose a student to assign</p>
-          <p class="text-blue-800">• Tap occupied seats to remove the student</p>
-          <p class="text-blue-800">• Scroll the seating chart horizontally if needed</p>
-        </div>
 
         <!-- Seating Chart (table bench layout) -->
         <section id="seating-chart-container" class="bg-white p-2 sm:p-4 rounded shadow-sm print:shadow-none border border-transparent overflow-x-auto" aria-label="Seating chart">
