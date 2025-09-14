@@ -108,6 +108,11 @@ function createSeatCell(row, seatId) {
       if (typeof window.redrawAll === 'function') window.redrawAll();
     });
   }
+
+  // Add mobile touch interaction support
+  if (typeof window.addMobileSeatInteraction === 'function') {
+    window.addMobileSeatInteraction(cell, seatId);
+  }
 }
 
 function benchLabelHtml(benchNum, raw) {

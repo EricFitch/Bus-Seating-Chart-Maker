@@ -36,5 +36,21 @@ A privacy-focused, offline-friendly web app to design and print bus seating char
 - Bench Icons print as 4 equal quadrants, 1 icon per quadrant (4 per page), with large icon and bench number only
 - Print colors: If colors do not show, enable "Print backgrounds" or "Background graphics" in your browser's print dialog (see tooltip)
 
+## Deploy to GitHub Pages
+This is a static site, so GitHub Pages can host it directly from the repository.
+
+Steps:
+1. Push to GitHub (done). Repository: `EricFitch/Bus-Seating-Chart-Maker`.
+2. In GitHub: Settings → Pages
+	- Source: Deploy from a branch
+	- Branch: `master` (or `main` if you switch), Folder: `/ (root)`
+	- Save
+3. Wait 1–2 minutes for the build to finish.
+
+Your site will be available at:
+- User site: `https://ericfitch.github.io/Bus-Seating-Chart-Maker/`
+
+Tip: A `.nojekyll` file is included to skip Jekyll processing on Pages.
+
 ## License
 MIT

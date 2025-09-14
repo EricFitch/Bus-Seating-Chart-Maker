@@ -14,6 +14,22 @@
   background-color: #ffffff; /* ensure a consistent base in light mode */
   color: #0f172a; /* slate-900 */
 }
+
+/* Mobile-specific table adjustments */
+@media (max-width: 640px) {
+  #seating-chart th, #seating-chart td {
+    min-width: 76px;
+    padding: 0.375rem;
+    font-size: 0.8rem;
+  }
+  .seat-content {
+    font-size: 0.8em;
+  }
+  .bench-icon {
+    font-size: 18pt !important;
+  }
+}
+
 #seating-chart th { background-color: #f1f5f9; /* slate-100 */ }
 .bench-label { font-weight: 600; background-color: #f1f5f9; }
 .aisle { background-color: #e2e8f0; font-weight: 600; }
@@ -21,6 +37,26 @@
 .seat.empty.drag-over { outline: 2px dashed #22c55e; outline-offset: -4px; background-color: #ecfdf5; }
 /* Also show drag-over for occupied to highlight swap/replace */
 .seat.drag-over { outline: 2px dashed #22c55e; outline-offset: -4px; }
+
+/* Touch-friendly interactions for mobile */
+@media (max-width: 768px) {
+  .seat.empty, .seat[draggable="true"] {
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+  
+  /* Larger touch targets on mobile */
+  .seat {
+    min-height: 44px;
+  }
+  
+  /* Tap feedback for mobile */
+  .seat:active {
+    background-color: #e0f2fe;
+    transform: scale(0.98);
+    transition: all 0.1s ease;
+  }
+}
 
 /* Draggable affordances (handle icon on hover) */
 .seat { position: relative; }
@@ -83,6 +119,8 @@
   .no-print { display: none !important; }
   body { background: white; }
   #seating-chart th, #seating-chart td { border-color: #94a3b8 !important; }
+  /* Ensure mobile instructions are hidden in print */
+  .lg\:hidden { display: none !important; }
 }
 
 /* Print tags helpers (used in popup window inline too) */
@@ -95,13 +133,32 @@
 /* Bus outline wrapper (top-down bus frame) */
 
 /* Modal styles */
-.modal-root { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; }
+.modal-root { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; z-index: 50; }
 .modal-root.show { display: flex; }
 .modal-backdrop { position: absolute; inset: 0; background: rgba(15, 23, 42, 0.5); }
 .modal-panel { position: relative; background: #fff; border-radius: 10px; width: min(560px, 92vw); max-height: 80vh; overflow: auto; box-shadow: 0 10px 30px rgba(2,6,23,.2); padding: 16px; }
 .modal-title { font-weight: 700; margin-bottom: 8px; }
 .modal-list { display: grid; grid-template-columns: 1fr; gap: 8px; max-height: 60vh; overflow: auto; }
-.modal-list button { text-align: left; padding: 8px 10px; border: 1px solid #e2e8f0; border-radius: 8px; background: #fff; cursor: pointer; }
+.modal-list button { text-align: left; padding: 8px 10px; border: 1px solid #e2e8f0; border-radius: 8px; background: #fff; cursor: pointer; touch-action: manipulation; }
 .modal-list button:hover { background: #f8fafc; }
 .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
+
+/* Mobile modal improvements */
+@media (max-width: 640px) {
+  .modal-panel {
+    width: 95vw;
+    max-height: 85vh;
+    margin: 16px;
+  }
+  
+  .modal-list button {
+    padding: 12px 14px;
+    font-size: 0.9rem;
+  }
+  
+  .modal-actions button {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+  }
+}
 

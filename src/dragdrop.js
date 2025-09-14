@@ -1,5 +1,6 @@
 // Drag-and-drop logic for Bus Seating Chart Maker
 // Handles dragstart, dragover, drop, and related helpers
+// Includes mobile touch support
 
 function makeDraggable(element, uuid, sourceType, seatId) {
   element.draggable = true;
@@ -12,6 +13,33 @@ function makeDraggable(element, uuid, sourceType, seatId) {
     }
     e.dataTransfer.effectAllowed = 'move';
   });
+
+  // Add mobile touch support for seat assignment
+  if (sourceType === 'roster') {
+    // For roster items, add touch to assign to empty seats
+    element.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      // Find the first available empty seat and assign
+      const emptySeat = document.querySelector('.seat.empty');
+      if (emptySeat) {
+        const seatId = emptySeat.dataset.seatId;
+        if (seatId) {
+          window.seatingAssignments[uuid] = seatId;
+          if (typeof window.redrawAll === 'function') window.redrawAll();
+        }
+      } else {
+        // No empty seats, show modal picker
+        const seatedStudents = Object.keys(window.seatingAssignments);
+        if (seatedStudents.length > 0) {
+          // Find a seat to potentially replace
+          const firstSeat = document.querySelector('.seat[data-seat-id]');
+          if (firstSeat && typeof window.openSeatPicker === 'function') {
+            window.openSeatPicker(firstSeat.dataset.seatId);
+          }
+        }
+      }
+    });
+  }
 }
 
 function makeDropTarget(element, onDrop) {
@@ -25,6 +53,35 @@ function makeDropTarget(element, onDrop) {
   });
 }
 
+// Mobile-friendly seat interaction helper
+function addMobileSeatInteraction(seatElement, seatId) {
+  // Add touch event for mobile seat assignment
+  seatElement.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // If seat is empty, open picker to assign a student
+    if (seatElement.classList.contains('empty')) {
+      if (typeof window.openSeatPicker === 'function') {
+        window.openSeatPicker(seatId);
+      }
+    } else {
+      // If seat is occupied, option to remove student (move back to roster)
+      const studentUuid = Object.keys(window.seatingAssignments).find(
+        uuid => window.seatingAssignments[uuid] === seatId
+      );
+      if (studentUuid) {
+        const student = window.allStudents[studentUuid];
+        if (student && confirm(`Remove ${student.firstName} ${student.lastName} from this seat?`)) {
+          delete window.seatingAssignments[studentUuid];
+          if (typeof window.redrawAll === 'function') window.redrawAll();
+        }
+      }
+    }
+  });
+}
+
 // Export functions
 window.makeDraggable = makeDraggable;
 window.makeDropTarget = makeDropTarget;
+window.addMobileSeatInteraction = addMobileSeatInteraction;

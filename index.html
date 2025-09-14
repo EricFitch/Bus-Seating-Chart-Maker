@@ -13,11 +13,11 @@
 </head>
 <body class="bg-slate-100 text-slate-900">
   <!-- Main grid layout -->
-  <div class="min-h-dvh grid grid-cols-1 lg:grid-cols-[320px_1fr]">
+  <div class="min-h-dvh flex flex-col lg:grid lg:grid-cols-[320px_1fr]">
     <!-- Sidebar: navigation and controls -->
-    <aside class="no-print bg-white border-r border-slate-200 p-4 space-y-4" aria-label="Sidebar">
+    <aside class="no-print bg-white border-b lg:border-r lg:border-b-0 border-slate-200 p-2 lg:p-4 space-y-2 lg:space-y-4 order-2 lg:order-1" aria-label="Sidebar">
       <header>
-        <h1 class="text-xl font-bold" aria-label="Bus Seating Chart Title">🪑 Bus Seating Chart</h1>
+        <h1 class="text-lg lg:text-xl font-bold" aria-label="Bus Seating Chart Title">🪑 Bus Seating Chart</h1>
       </header>
 
       <!-- Layout Controls (rows only for bench layout) -->
@@ -30,7 +30,7 @@
             </label>
           </div>
           <p class="text-xs text-slate-500">Bench layout uses 2 benches per row with 3 seats per side (A/B/C). Aisle is fixed.</p>
-          <button id="applyLayout" type="button" class="mt-2 w-full bg-blue-600 text-white rounded px-3 py-2 hover:bg-blue-500 active:scale-[.99] transition" aria-label="Apply layout">Apply Layout</button>
+          <button id="applyLayout" type="button" class="mt-2 w-full bg-blue-600 text-white rounded px-3 py-2 hover:bg-blue-500 active:scale-[.99] transition text-sm lg:text-base touch-manipulation" aria-label="Apply layout">Apply Layout</button>
         </form>
       </section>
 
@@ -95,33 +95,44 @@
     </aside>
 
     <!-- Main content -->
-    <main class="p-4" aria-label="Main content">
+    <main class="p-2 lg:p-4 order-1 lg:order-2" aria-label="Main content">
       <div class="max-w-6xl mx-auto">
         <!-- Title & Meta -->
-        <header class="no-print flex items-center justify-between mb-4">
+        <header class="no-print flex flex-col lg:flex-row lg:items-center justify-between mb-4 gap-2">
           <div>
-            <h2 class="text-2xl font-semibold">Current Bus Layout</h2>
+            <h2 class="text-xl lg:text-2xl font-semibold">Current Bus Layout</h2>
             <p id="meta" class="text-sm text-slate-600">8 rows × 4 seats/row • Aisle: yes</p>
           </div>
           <div class="text-sm text-slate-600">Last saved: <span id="lastSaved">never</span></div>
         </header>
 
         <!-- Chart Controls -->
-        <section class="no-print flex items-center justify-between bg-white rounded shadow-sm border p-3 mb-3" aria-label="Chart controls">
+        <section class="no-print flex flex-col lg:flex-row lg:items-center justify-between bg-white rounded shadow-sm border p-3 mb-3 gap-3" aria-label="Chart controls">
           <div class="flex items-center gap-2">
             <label class="text-sm" for="theme-selector">Theme</label>
-            <select id="theme-selector" class="border rounded px-2 py-1 text-sm" aria-label="Theme selector"></select>
+            <select id="theme-selector" class="border rounded px-2 py-1 text-sm flex-1 lg:flex-none" aria-label="Theme selector"></select>
           </div>
-          <div class="flex items-center gap-2">
-            <button class="print-btn bg-emerald-600 text-white rounded px-3 py-2 hover:bg-emerald-500 active:scale-[.99] transition disabled:opacity-50" id="print-chart-btn" disabled aria-label="Print seating chart">Print Chart</button>
-            <button class="print-btn bg-emerald-600 text-white rounded px-3 py-2 hover:bg-emerald-500 active:scale-[.99] transition disabled:opacity-50" id="print-tags-btn" disabled aria-label="Print name tags">Print Tags</button>
-            <button class="print-btn bg-emerald-700 text-white rounded px-3 py-2 hover:bg-emerald-600 active:scale-[.99] transition disabled:opacity-50" id="print-icons-btn" disabled aria-label="Print bench icons">Print Bench Icons</button>
+          <div class="flex flex-wrap items-center gap-2">
+            <button class="print-btn bg-emerald-600 text-white rounded px-3 py-2 hover:bg-emerald-500 active:scale-[.99] transition disabled:opacity-50 text-sm touch-manipulation" id="print-chart-btn" disabled aria-label="Print seating chart">Print Chart</button>
+            <button class="print-btn bg-emerald-600 text-white rounded px-3 py-2 hover:bg-emerald-500 active:scale-[.99] transition disabled:opacity-50 text-sm touch-manipulation" id="print-tags-btn" disabled aria-label="Print name tags">Print Tags</button>
+            <button class="print-btn bg-emerald-700 text-white rounded px-3 py-2 hover:bg-emerald-600 active:scale-[.99] transition disabled:opacity-50 text-sm touch-manipulation" id="print-icons-btn" disabled aria-label="Print bench icons">Print Bench Icons</button>
           </div>
         </section>
 
+        <!-- Mobile Usage Instructions -->
+        <div class="lg:hidden bg-blue-50 border border-blue-200 rounded p-3 mb-3 text-sm">
+          <h3 class="font-medium text-blue-900 mb-1">📱 Mobile Instructions</h3>
+          <p class="text-blue-800">• Tap students in the roster to assign them to the first available seat</p>
+          <p class="text-blue-800">• Tap empty seats to choose a student to assign</p>
+          <p class="text-blue-800">• Tap occupied seats to remove the student</p>
+          <p class="text-blue-800">• Scroll the seating chart horizontally if needed</p>
+        </div>
+
         <!-- Seating Chart (table bench layout) -->
-        <section id="seating-chart-container" class="bg-white p-4 rounded shadow-sm print:shadow-none border border-transparent overflow-auto" aria-label="Seating chart">
-          <table id="seating-chart" class="w-full border-collapse" aria-label="Bus seating chart"></table>
+        <section id="seating-chart-container" class="bg-white p-2 sm:p-4 rounded shadow-sm print:shadow-none border border-transparent overflow-x-auto" aria-label="Seating chart">
+          <div class="min-w-max">
+            <table id="seating-chart" class="w-full border-collapse" aria-label="Bus seating chart"></table>
+          </div>
         </section>
       </div>
     </main>
