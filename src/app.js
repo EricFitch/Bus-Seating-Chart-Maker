@@ -199,9 +199,9 @@
       
       rows.forEach(line => {
         const cols = line.split(',').map(s => s.trim());
-        // Require at least 4 columns and non-empty name and grade
-        if (cols.length >= 4 && cols[2] && cols[3]) {
-          addStudent({ id: cols[0], lastName: cols[1], firstName: cols[2], grade: cols[3] });
+        // Require at least 3 columns and non-empty name and grade
+        if (cols.length >= 3 && cols[0] && cols[1] && cols[2]) {
+          addStudent({ lastName: cols[0], firstName: cols[1], grade: cols[2] });
           imported++;
         } else {
           skipped++;
@@ -226,7 +226,6 @@
     e.preventDefault();
     const form = e.target;
     addStudent({
-      id: form.querySelector('#student-id').value,
       firstName: form.querySelector('#first-name').value,
       lastName: form.querySelector('#last-name').value,
       grade: form.querySelector('#grade').value

@@ -42,15 +42,12 @@
           <button class="tab-button px-3 py-2 text-sm" data-tab="add-manual" aria-controls="add-manual">Add Manually</button>
         </nav>
         <div id="upload-csv" class="tab-content space-y-2" role="tabpanel" aria-labelledby="upload-csv-tab">
-          <p class="text-xs text-slate-600">CSV format: <code>Student ID,Last Name,First Name,Grade</code></p>
+          <p class="text-xs text-slate-600">CSV format: <code>Last Name,First Name,Grade</code></p>
           <label for="csv-file" class="text-sm">Upload CSV</label>
           <input type="file" id="csv-file" accept=".csv" class="w-full border rounded px-2 py-1" aria-label="Upload CSV" />
         </div>
         <div id="add-manual" class="tab-content hidden" role="tabpanel" aria-labelledby="add-manual-tab">
           <form id="add-student-form" class="space-y-2" aria-label="Add student manually">
-            <label for="student-id">Student ID (optional)
-              <input type="text" id="student-id" name="student-id" placeholder="Student ID (optional)" class="w-full border rounded px-2 py-1" />
-            </label>
             <label for="first-name">First Name
               <input type="text" id="first-name" name="first-name" placeholder="First Name" required class="w-full border rounded px-2 py-1" />
             </label>
