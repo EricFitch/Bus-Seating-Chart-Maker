@@ -94,6 +94,28 @@
             <label class="text-sm" for="theme-selector">Theme</label>
             <select id="theme-selector" class="border rounded px-2 py-1 text-sm flex-1" aria-label="Theme selector"></select>
           </div>
+          
+          <!-- Print Options -->
+          <div class="bg-slate-50 border border-slate-200 rounded p-2 space-y-1">
+            <h3 class="text-xs font-medium text-slate-700">Print Options</h3>
+            <label class="flex items-center gap-2 text-xs cursor-pointer">
+              <input type="checkbox" id="print-show-bench-numbers" checked class="rounded" />
+              <span>Show bench seat numbers</span>
+            </label>
+            <label class="flex items-center gap-2 text-xs cursor-pointer">
+              <input type="checkbox" id="print-show-row-numbers" checked class="rounded" />
+              <span>Show row numbers</span>
+            </label>
+            <label class="flex items-center gap-2 text-xs cursor-pointer">
+              <input type="checkbox" id="print-show-seat-positions" checked class="rounded" />
+              <span>Show seat positions (Window/Middle/Aisle)</span>
+            </label>
+            <label class="flex items-center gap-2 text-xs cursor-pointer">
+              <input type="checkbox" id="print-show-theme-icons" checked class="rounded" />
+              <span>Show theme icons</span>
+            </label>
+          </div>
+          
           <div class="flex flex-col gap-2">
             <button class="print-btn bg-emerald-600 text-white rounded px-3 py-2 hover:bg-emerald-500 active:scale-[.99] transition disabled:opacity-50 text-sm touch-manipulation" id="print-chart-btn" disabled aria-label="Print seating chart">Print Chart</button>
             <button class="print-btn bg-emerald-600 text-white rounded px-3 py-2 hover:bg-emerald-500 active:scale-[.99] transition disabled:opacity-50 text-sm touch-manipulation" id="print-tags-btn" disabled aria-label="Print name tags">Print Tags</button>

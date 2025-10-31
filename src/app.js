@@ -367,7 +367,16 @@
     const total = window.rowsCount;
     const firstHalf = Math.ceil(total / 2);
     const ranges = [ [1, firstHalf], [firstHalf + 1, total] ];
-    let html = generateChartHtml(ranges, theme, total);
+    
+    // Read print options from checkboxes
+    const printOptions = {
+      showBenchNumbers: $('#print-show-bench-numbers')?.checked ?? true,
+      showRowNumbers: $('#print-show-row-numbers')?.checked ?? true,
+      showSeatPositions: $('#print-show-seat-positions')?.checked ?? true,
+      showThemeIcons: $('#print-show-theme-icons')?.checked ?? true
+    };
+    
+    let html = generateChartHtml(ranges, theme, total, printOptions);
     
     // Inject print instructions banner
     html = html.replace('<body>', `<body>
@@ -380,7 +389,7 @@
   window.printChartLandscapeSplit = printChartLandscapeSplit;
 
   // Helper: Generate chart HTML for print
-  function generateChartHtml(ranges, theme, total) {
+  function generateChartHtml(ranges, theme, total, printOptions) {
     const css = `
       @page { size: letter landscape; margin: 6mm; }
       body { margin: 0; font-family: system-ui, Segoe UI, Arial, "Segoe UI Emoji", "Noto Color Emoji", "Apple Color Emoji", sans-serif; background: white; color: #0f172a; }
@@ -396,48 +405,80 @@
       .seat-content { font-weight: 700; }
       .seat-grade { font-style: italic; font-size: 10pt; }
       .seat-id { font-size: 9pt; color: #475569; }
+      .hidden { display: none; }
       @media print { .page:last-child { page-break-after: auto; } }
     `;
     let html = `<!doctype html><html><head><meta charset="utf-8"><title>Print Seating Chart</title><style>${css}</style></head><body>`;
     ranges.forEach(([start, end]) => {
       if (start > end || start > total) return;
       html += '<div class="page">';
-      html += generateSeatingTableHtml(start, Math.min(end, total), theme);
+      html += generateSeatingTableHtml(start, Math.min(end, total), theme, printOptions);
       html += '</div>';
     });
     html += '</body></html>';
     return html;
   }
 
-  function generateSeatingTableHtml(startRow, endRow, theme) {
-    const cols = ['Left Side', 'Window (L)', 'Middle (L)', 'Aisle (L)', 'AISLE', 'Aisle (R)', 'Middle (R)', 'Window (R)', 'Right Side'];
+  function generateSeatingTableHtml(startRow, endRow, theme, printOptions) {
+    // Build column headers based on options
+    const cols = [];
+    cols.push('Left Side');
+    if (printOptions.showSeatPositions) {
+      cols.push('Window (L)', 'Middle (L)', 'Aisle (L)');
+    } else {
+      cols.push('Seat 1', 'Seat 2', 'Seat 3');
+    }
+    cols.push('AISLE');
+    if (printOptions.showSeatPositions) {
+      cols.push('Aisle (R)', 'Middle (R)', 'Window (R)');
+    } else {
+      cols.push('Seat 1', 'Seat 2', 'Seat 3');
+    }
+    cols.push('Right Side');
+    
     const rowsInHalf = (endRow - startRow + 1);
     let out = '<table><thead><tr>' + cols.map(c => `<th>${c}</th>`).join('') + `</tr></thead><tbody style="--rows:${rowsInHalf}">`;
     for (let i = startRow; i <= endRow; i++) {
       const leftBench = (i * 2) - 1;
       const rightBench = i * 2;
-      const leftLabel = formatBenchLabel(theme, leftBench);
-      const rightLabel = formatBenchLabel(theme, rightBench);
+      const leftLabel = formatBenchLabel(theme, leftBench, printOptions);
+      const rightLabel = formatBenchLabel(theme, rightBench, printOptions);
       out += '<tr>';
-      out += `<td class="bench-label">Bench Seat ${leftBench}<br>${leftLabel}</td>`;
+      out += `<td class="bench-label">${leftLabel}</td>`;
       out += seatCellHtml(`${leftBench}LA`);
       out += seatCellHtml(`${leftBench}LB`);
       out += seatCellHtml(`${leftBench}LC`);
-      out += `<td class="aisle">Row ${i}</td>`;
+      out += `<td class="aisle">${printOptions.showRowNumbers ? `Row ${i}` : '&nbsp;'}</td>`;
       out += seatCellHtml(`${rightBench}RC`);
       out += seatCellHtml(`${rightBench}RB`);
       out += seatCellHtml(`${rightBench}RA`);
-      out += `<td class="bench-label">Bench Seat ${rightBench}<br>${rightLabel}</td>`;
+      out += `<td class="bench-label">${rightLabel}</td>`;
       out += '</tr>';
     }
     out += '</tbody></table>';
     return out;
   }
 
-  function formatBenchLabel(theme, benchNum) {
-    const { icon, name } = getThemeItem(theme, benchNum);
-    if (icon && name) return `${icon} ${name}`;
-    return icon || name || '';
+  function formatBenchLabel(theme, benchNum, printOptions) {
+    const parts = [];
+    
+    // Add bench number if enabled
+    if (printOptions.showBenchNumbers) {
+      parts.push(`Bench Seat ${benchNum}`);
+    }
+    
+    // Add theme icon if enabled
+    if (printOptions.showThemeIcons) {
+      const { icon, name } = getThemeItem(theme, benchNum);
+      if (icon && name) {
+        parts.push(`${icon} ${name}`);
+      } else if (icon || name) {
+        parts.push(icon || name);
+      }
+    }
+    
+    // Return formatted label or just "Bench" if nothing is shown
+    return parts.length > 0 ? parts.join('<br>') : 'Bench';
   }
 
   function seatCellHtml(seatId) {
