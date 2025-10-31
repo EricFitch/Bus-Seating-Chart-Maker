@@ -378,12 +378,6 @@
     
     let html = generateChartHtml(ranges, theme, total, printOptions);
     
-    // Inject print instructions banner
-    html = html.replace('<body>', `<body>
-      <div class="print-instructions" style="background:#fef3c7;border:2px solid #f59e0b;padding:12px;margin-bottom:16px;border-radius:8px;text-align:center;font-weight:600;">
-        ⚠️ Enable "Print backgrounds" in your browser settings to see grade colors
-      </div>`);
-    
     openPrintWindow(html);
   }
   window.printChartLandscapeSplit = printChartLandscapeSplit;
