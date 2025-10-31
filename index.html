@@ -64,7 +64,12 @@
 
       <!-- Unassigned List -->
       <section class="space-y-2 min-h-40 flex flex-col order-2" aria-labelledby="unassigned-heading">
-        <h3 id="unassigned-heading" class="text-sm font-medium">Unassigned Students</h3>
+        <div class="flex items-center justify-between">
+          <h3 id="unassigned-heading" class="text-sm font-medium">Unassigned Students</h3>
+          <button id="sort-toggle-btn" type="button" class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-2 py-1 rounded transition" title="Toggle sort order">
+            Sort: Last Name
+          </button>
+        </div>
         <ul id="unassignedList" class="min-h-24 bg-slate-50 border border-slate-200 rounded p-2 space-y-1 flex-1 overflow-auto" aria-label="Unassigned students list"></ul>
       </section>
 

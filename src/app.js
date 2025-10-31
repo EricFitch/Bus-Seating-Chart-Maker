@@ -27,6 +27,7 @@
   window.seatingAssignments = window.seatingAssignments || {};
   window.selectedStudentUuid = window.selectedStudentUuid || null;
   window.rowsCount = window.rowsCount || 13;
+  window.sortBy = window.sortBy || 'lastName'; // 'lastName' or 'firstName'
   window.GRADE_COLORS = window.GRADE_COLORS || {
     PK: '#FFD966', KG: '#C9DAF8', '01': '#D9EAD3', '02': '#F4CCCC', '03': '#EAD1DC',
     '04': '#FFF2CC', '05': '#D0E0E3', '06': '#FDE68A', '07': '#A7F3D0', '08': '#FCA5A5',
@@ -91,6 +92,9 @@
   $('#csv-file').addEventListener('change', handleCsvUpload);
   $('#add-student-form').addEventListener('submit', handleManualAdd);
 
+  // Sort toggle button
+  $('#sort-toggle-btn').addEventListener('click', toggleSort);
+
   // Print buttons
   $('#print-chart-btn').addEventListener('click', printChartLandscapeSplit);
   $('#print-tags-btn').addEventListener('click', printTags);
@@ -137,23 +141,39 @@
         redrawAll();
       }
     });
-    Object.keys(allStudents).forEach(uuid => {
-      if (!assigned.has(uuid)) {
-        const s = allStudents[uuid];
-        const li = document.createElement('li');
-        li.textContent = `${s.firstName} ${s.lastName} (Grade: ${s.grade})`;
-        li.dataset.uuid = uuid;
-        if (uuid === selectedStudentUuid) li.classList.add('selected');
-        li.addEventListener('click', () => selectStudent(uuid));
-        // Make draggable for drag-and-drop assignment
-        li.draggable = true;
-        li.addEventListener('dragstart', (e) => {
-          e.dataTransfer.setData('text/plain', uuid);
-          e.dataTransfer.setData('text/bus-origin', 'roster');
-          e.dataTransfer.effectAllowed = 'move';
-        });
-        unassignedList.appendChild(li);
-      }
+    
+    // Get unassigned students and sort based on current sort preference
+    const unassignedStudents = Object.keys(allStudents)
+      .filter(uuid => !assigned.has(uuid))
+      .map(uuid => ({ uuid, ...allStudents[uuid] }))
+      .sort((a, b) => {
+        if (window.sortBy === 'firstName') {
+          // Sort by first name, then last name
+          const firstNameCompare = (a.firstName || '').localeCompare(b.firstName || '');
+          if (firstNameCompare !== 0) return firstNameCompare;
+          return (a.lastName || '').localeCompare(b.lastName || '');
+        } else {
+          // Sort by last name, then first name (default)
+          const lastNameCompare = (a.lastName || '').localeCompare(b.lastName || '');
+          if (lastNameCompare !== 0) return lastNameCompare;
+          return (a.firstName || '').localeCompare(b.firstName || '');
+        }
+      });
+    
+    unassignedStudents.forEach(({ uuid, firstName, lastName, grade }) => {
+      const li = document.createElement('li');
+      li.textContent = `${firstName} ${lastName} (Grade: ${grade})`;
+      li.dataset.uuid = uuid;
+      if (uuid === selectedStudentUuid) li.classList.add('selected');
+      li.addEventListener('click', () => selectStudent(uuid));
+      // Make draggable for drag-and-drop assignment
+      li.draggable = true;
+      li.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', uuid);
+        e.dataTransfer.setData('text/bus-origin', 'roster');
+        e.dataTransfer.effectAllowed = 'move';
+      });
+      unassignedList.appendChild(li);
     });
     updatePrintButtons();
   }
@@ -246,6 +266,21 @@
     renderUnassignedList();
   }
   window.selectStudent = selectStudent;
+
+  function toggleSort() {
+    // Toggle between lastName and firstName
+    window.sortBy = (window.sortBy === 'lastName') ? 'firstName' : 'lastName';
+    
+    // Update button text
+    const btn = $('#sort-toggle-btn');
+    if (btn) {
+      btn.textContent = window.sortBy === 'lastName' ? 'Sort: Last Name' : 'Sort: First Name';
+    }
+    
+    // Re-render list with new sort order
+    renderUnassignedList();
+  }
+  window.toggleSort = toggleSort;
 
   function assignSeat(seatId) {
     if (!selectedStudentUuid) { alert('Select a student from the list first.'); return; }
