@@ -56,6 +56,13 @@
     transform: scale(0.98);
     transition: all 0.1s ease;
   }
+  
+  /* Touch feedback class for visual indication */
+  .seat.touching {
+    background-color: #dbeafe !important;
+    transform: scale(0.98);
+    transition: all 0.1s ease;
+  }
 
   /* Mobile sidebar layout optimization */
   aside {
@@ -123,6 +130,19 @@
 #unassignedList.drag-over { outline: 2px dashed #22c55e; outline-offset: 2px; background: #ecfdf5; }
 
 /* Dark mode removed for now to keep readability consistent */
+
+/* Screen reader only content */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
 
 @media print {
   @page { margin: 12mm; }

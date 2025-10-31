@@ -12,6 +12,10 @@ function openSeatPicker(targetSeatId) {
   const backdrop = document.getElementById('modal-backdrop');
   if (!root || !content) return;
   content.innerHTML = '';
+  
+  // Define escape handler with cleanup
+  const escHandler = (ev) => { if (ev.key === 'Escape') closeModal(); };
+  
   const title = document.createElement('div');
   title.className = 'modal-title';
   title.textContent = 'Assign student to seat';
@@ -41,13 +45,14 @@ function openSeatPicker(targetSeatId) {
   root.classList.add('show');
   root.style.display = 'flex';
   if (backdrop) backdrop.addEventListener('click', closeModal, { once: true });
-  document.addEventListener('keydown', escCloseOnce, { once: true });
+  document.addEventListener('keydown', escHandler);
 
-  function escCloseOnce(ev) { if (ev.key === 'Escape') closeModal(); }
   function closeModal() {
     root.classList.remove('show');
     root.style.display = 'none';
     content.innerHTML = '';
+    // Clean up event listener
+    document.removeEventListener('keydown', escHandler);
   }
 }
 

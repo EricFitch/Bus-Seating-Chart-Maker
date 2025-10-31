@@ -1,6 +1,27 @@
 // Seating chart rendering for Bus Seating Chart Maker
 // Handles rendering of seating chart and seat cell creation
 
+// Create ARIA live region for screen reader announcements
+const announcer = document.createElement('div');
+announcer.setAttribute('role', 'status');
+announcer.setAttribute('aria-live', 'polite');
+announcer.setAttribute('aria-atomic', 'true');
+announcer.className = 'sr-only';
+announcer.id = 'aria-announcer';
+if (!document.getElementById('aria-announcer')) {
+  document.body.appendChild(announcer);
+}
+
+// Helper function to announce changes to screen readers
+function announce(message) {
+  const announcer = document.getElementById('aria-announcer');
+  if (announcer) {
+    announcer.textContent = message;
+    // Clear after a brief delay to allow for multiple announcements
+    setTimeout(() => { announcer.textContent = ''; }, 1000);
+  }
+}
+window.announce = announce;
 
 function renderSeatingChart() {
   const table = window.$('#seating-chart');
@@ -53,7 +74,11 @@ function createSeatCell(row, seatId) {
     // Use global normalizeGrade for color lookup
     const g = typeof window.normalizeGrade === 'function' ? window.normalizeGrade(s.grade) : String(s.grade || '').toUpperCase();
     cell.style.backgroundColor = window.GRADE_COLORS[g] || window.GRADE_COLORS.default;
-    cell.addEventListener('click', () => window.unassignSeat(uuid));
+    cell.addEventListener('click', () => {
+      window.unassignSeat(uuid);
+      // Announce unassignment
+      announce(`${s.firstName} ${s.lastName} removed from seat`);
+    });
 
     // Make occupied seats draggable to move students directly
     cell.draggable = true;
@@ -76,14 +101,18 @@ function createSeatCell(row, seatId) {
       const targetSeat = seatId;
       const targetUuid = Object.keys(window.seatingAssignments).find(u => window.seatingAssignments[u] === targetSeat);
       if (!targetUuid) return;
+      const draggedStudent = window.allStudents[draggedUuid];
+      const targetStudent = window.allStudents[targetUuid];
       if (origin === 'roster') {
         // Replace: move roster student into target seat, unassign target student back to roster
         window.seatingAssignments[draggedUuid] = targetSeat;
         delete window.seatingAssignments[targetUuid];
+        announce(`${draggedStudent.firstName} ${draggedStudent.lastName} assigned to ${desc}, ${targetStudent.firstName} ${targetStudent.lastName} moved to unassigned`);
       } else if (sourceSeat) {
         // Swap: seat-to-seat drag
         window.seatingAssignments[draggedUuid] = targetSeat;
         window.seatingAssignments[targetUuid] = sourceSeat;
+        announce(`${draggedStudent.firstName} ${draggedStudent.lastName} and ${targetStudent.firstName} ${targetStudent.lastName} swapped seats`);
       } else {
         return;
       }
@@ -103,8 +132,11 @@ function createSeatCell(row, seatId) {
       cell.classList.remove('drag-over');
       const draggedUuid = e.dataTransfer.getData('text/plain');
       if (!draggedUuid || !window.allStudents[draggedUuid]) return;
+      const student = window.allStudents[draggedUuid];
       window.seatingAssignments[draggedUuid] = seatId;
       window.selectedStudentUuid = null;
+      // Announce assignment
+      announce(`${student.firstName} ${student.lastName} assigned to ${desc}`);
       if (typeof window.redrawAll === 'function') window.redrawAll();
     });
   }

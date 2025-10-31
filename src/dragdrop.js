@@ -55,10 +55,16 @@ function makeDropTarget(element, onDrop) {
 
 // Mobile-friendly seat interaction helper
 function addMobileSeatInteraction(seatElement, seatId) {
+  // Add visual feedback on touch start
+  seatElement.addEventListener('touchstart', () => {
+    seatElement.classList.add('touching');
+  });
+  
   // Add touch event for mobile seat assignment
   seatElement.addEventListener('touchend', (e) => {
     e.preventDefault();
     e.stopPropagation();
+    seatElement.classList.remove('touching');
     
     // If seat is empty, open picker to assign a student
     if (seatElement.classList.contains('empty')) {
@@ -78,6 +84,11 @@ function addMobileSeatInteraction(seatElement, seatId) {
         }
       }
     }
+  });
+  
+  // Remove touching class on cancel
+  seatElement.addEventListener('touchcancel', () => {
+    seatElement.classList.remove('touching');
   });
 }
 

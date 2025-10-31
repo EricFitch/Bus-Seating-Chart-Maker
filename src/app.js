@@ -44,12 +44,19 @@
   window.unassignedList = $('#unassignedList');
   window.lastSavedEl = $('#lastSaved');
   window.metaEl = $('#meta');
-  window.rowsCount = rowsCount;
   window.GRADE_COLORS = GRADE_COLORS;
+  
+  // Initialize rowsInput with current value
+  rowsInput.value = window.rowsCount;
+
+  // No-op persistence functions (removed for privacy)
+  function saveState() { /* no-op for privacy */ }
+  function loadState() { /* no-op for privacy */ }
+  function touchSaved() { /* no-op for privacy */ }
 
   // Wire buttons
   $('#applyLayout').addEventListener('click', () => {
-  rowsCount = window.clamp(parseInt(rowsInput.value || '13', 10), 1, 30);
+    window.rowsCount = window.clamp(parseInt(rowsInput.value || '13', 10), 1, 30);
     renderSeatingChart();
     saveState();
   });
@@ -104,8 +111,8 @@
       opt.value = name; opt.textContent = name;
       themeSelector.appendChild(opt);
     });
-    const saved = localStorage.getItem('busSeaterTheme') || 'Animals';
-    themeSelector.value = saved;
+    // Default to Animals theme (no persistence for privacy)
+    themeSelector.value = 'Animals';
   }
 
 
@@ -177,14 +184,37 @@
     reader.onload = (e) => {
       const text = String(e.target.result || '');
       const lines = text.split(/\r?\n/).filter(Boolean);
+      
+      // Validate CSV has at least header + one data row
+      if (lines.length < 2) {
+        alert('CSV must have at least a header row and one data row.');
+        ev.target.value = '';
+        return;
+      }
+      
       // Skip header if present
       const rows = lines.slice(1);
+      let imported = 0;
+      let skipped = 0;
+      
       rows.forEach(line => {
         const cols = line.split(',').map(s => s.trim());
-        if (cols.length >= 4) {
+        // Require at least 4 columns and non-empty name and grade
+        if (cols.length >= 4 && cols[2] && cols[3]) {
           addStudent({ id: cols[0], lastName: cols[1], firstName: cols[2], grade: cols[3] });
+          imported++;
+        } else {
+          skipped++;
         }
       });
+      
+      // Provide feedback to user
+      let message = `Imported ${imported} student(s)`;
+      if (skipped > 0) {
+        message += ` (skipped ${skipped} invalid row(s))`;
+      }
+      alert(message);
+      
       redrawAll();
       ev.target.value = '';
     };
@@ -335,10 +365,17 @@
   // Print seating chart in landscape, split into two pages
   function printChartLandscapeSplit() {
     const theme = THEMES[themeSelector.value] || THEMES.Default;
-    const total = rowsCount;
+    const total = window.rowsCount;
     const firstHalf = Math.ceil(total / 2);
     const ranges = [ [1, firstHalf], [firstHalf + 1, total] ];
     let html = generateChartHtml(ranges, theme, total);
+    
+    // Inject print instructions banner
+    html = html.replace('<body>', `<body>
+      <div class="print-instructions" style="background:#fef3c7;border:2px solid #f59e0b;padding:12px;margin-bottom:16px;border-radius:8px;text-align:center;font-weight:600;">
+        ⚠️ Enable "Print backgrounds" in your browser settings to see grade colors
+      </div>`);
+    
     openPrintWindow(html);
   }
   window.printChartLandscapeSplit = printChartLandscapeSplit;
@@ -405,16 +442,18 @@
   }
 
   function seatCellHtml(seatId) {
-  const uuid = Object.keys(GRADE_COLORS && seatingAssignments ? seatingAssignments : {}).find(u => seatingAssignments[u] === seatId);
-  if (!uuid) return `<td class="seat empty"><div class="seat-content">(Empty)</div></td>`;
-  const s = allStudents[uuid];
-  const g = typeof window.normalizeGrade === 'function' ? window.normalizeGrade(s.grade) : String(s.grade || '').toUpperCase();
-    const bg = GRADE_COLORS && GRADE_COLORS[g] ? GRADE_COLORS[g] : (GRADE_COLORS ? GRADE_COLORS.default : '#FFFFFF');
+    const uuid = Object.keys(seatingAssignments).find(u => seatingAssignments[u] === seatId);
+    if (!uuid) return `<td class="seat empty"><div class="seat-content">(Empty)</div></td>`;
+    const s = allStudents[uuid];
+    const g = typeof window.normalizeGrade === 'function' ? window.normalizeGrade(s.grade) : String(s.grade || '').toUpperCase();
+    const bg = (GRADE_COLORS && GRADE_COLORS[g]) ? GRADE_COLORS[g] : (GRADE_COLORS?.default || '#FFFFFF');
     // Show both colored badge and cell background
     return `<td class="seat" style="background:${bg} !important"><div class="seat-content">
       <div class="seat-name">${s.firstName} ${s.lastName}</div>
       <div class="seat-grade">Grade: <span style="display:inline-block;width:1em;height:1em;border-radius:50%;background:${bg};border:1px solid #888;vertical-align:middle;margin-right:4px"></span>${s.grade}</div>
     </div></td>`;
+  }
+
 // Add tooltip to print button for print backgrounds
 window.addEventListener('DOMContentLoaded', () => {
   const printBtn = document.getElementById('print-chart-btn');
@@ -422,7 +461,6 @@ window.addEventListener('DOMContentLoaded', () => {
     printBtn.title = 'If colors do not show when printing, enable "Print backgrounds" or "Background graphics" in your browser\'s print dialog.';
   }
 });
-  }
 
   // Printing - Bench Icons (large; 4 per page, Option A: 2x2 quadrants)
 
