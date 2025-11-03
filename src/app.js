@@ -100,6 +100,13 @@
   $('#print-tags-btn').addEventListener('click', printTags);
   $('#print-icons-btn').addEventListener('click', printBenchIcons);
 
+  // Export/Import buttons
+  $('#export-btn').addEventListener('click', exportJSON);
+  $('#import-file').addEventListener('change', importJSON);
+  $('#import-btn').addEventListener('click', () => {
+    $('#import-file').click();
+  });
+
   // Theme change
   themeSelector.addEventListener('change', () => {
     renderSeatingChart();
@@ -306,7 +313,94 @@
   window.redrawAll = redrawAll;
 
 
-  // Persistence removed for privacy: no localStorage, no export/import
+  // Export/Import functionality for saving and loading seating charts
+
+  function exportJSON() {
+    const data = {
+      version: '1.0',
+      exportDate: new Date().toISOString(),
+      rowsCount: window.rowsCount,
+      sortBy: window.sortBy,
+      theme: themeSelector.value,
+      students: allStudents,
+      seatingAssignments: seatingAssignments,
+      gradeColors: GRADE_COLORS
+    };
+    
+    const json = JSON.stringify(data, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `bus-seating-chart-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+  window.exportJSON = exportJSON;
+
+  function importJSON(ev) {
+    const file = ev.target.files?.[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = JSON.parse(String(e.target.result || ''));
+        
+        // Validate data structure
+        if (!data.students || !data.seatingAssignments) {
+          alert('Invalid file format. Please select a valid seating chart export file.');
+          return;
+        }
+        
+        // Load the data
+        window.allStudents = data.students || {};
+        window.seatingAssignments = data.seatingAssignments || {};
+        window.rowsCount = data.rowsCount || 13;
+        window.sortBy = data.sortBy || 'lastName';
+        
+        // Update UI elements
+        if (data.rowsCount) {
+          rowsInput.value = data.rowsCount;
+        }
+        if (data.theme && themeSelector) {
+          themeSelector.value = data.theme;
+        }
+        if (data.gradeColors) {
+          window.GRADE_COLORS = data.gradeColors;
+          // Update color pickers if present
+          Object.keys(data.gradeColors).forEach(grade => {
+            const picker = document.querySelector(`input[name="${grade}"]`);
+            if (picker) picker.value = data.gradeColors[grade];
+          });
+        }
+        
+        // Update sort button text
+        const sortBtn = $('#sort-toggle-btn');
+        if (sortBtn) {
+          sortBtn.textContent = window.sortBy === 'lastName' ? 'Sort: Last Name' : 'Sort: First Name';
+        }
+        
+        // Redraw everything
+        redrawAll();
+        
+        const studentCount = Object.keys(window.allStudents).length;
+        const assignedCount = Object.keys(window.seatingAssignments).length;
+        alert(`Successfully loaded ${studentCount} student(s) with ${assignedCount} seat assignment(s).`);
+        
+      } catch (err) {
+        alert('Error loading file: ' + err.message);
+      }
+      
+      // Clear the file input
+      ev.target.value = '';
+    };
+    
+    reader.readAsText(file);
+  }
+  window.importJSON = importJSON;
 
   // Printing - Tags
 
@@ -314,7 +408,16 @@
   function printTags() {
     const theme = THEMES[themeSelector.value] || THEMES.Default;
     const assignedList = getAssignedStudentsSorted();
-    let html = generateTagsHtml(assignedList, theme);
+    
+    // Read print options from checkboxes
+    const printOptions = {
+      showBenchNumbers: $('#print-show-bench-numbers')?.checked ?? true,
+      showRowNumbers: $('#print-show-row-numbers')?.checked ?? true,
+      showSeatPositions: $('#print-show-seat-positions')?.checked ?? true,
+      showThemeIcons: $('#print-show-theme-icons')?.checked ?? true
+    };
+    
+    let html = generateTagsHtml(assignedList, theme, printOptions);
     openPrintWindow(html);
   }
   window.printTags = printTags;
@@ -333,23 +436,26 @@
   }
 
   // Helper: Generate HTML for tags
-  function generateTagsHtml(list, theme) {
+  function generateTagsHtml(list, theme, printOptions) {
     let html = `<!doctype html><html><head><meta charset="utf-8"><title>Print Name Tags</title>
       <style>
-        body { margin: 0.5in; font-family: system-ui, Segoe UI, Arial, "Segoe UI Emoji", "Noto Color Emoji", "Apple Color Emoji", sans-serif; }
+        @page { margin: 0.5in; }
+        body { margin: 0; font-family: system-ui, Segoe UI, Arial, "Segoe UI Emoji", "Noto Color Emoji", "Apple Color Emoji", sans-serif; }
         .print-tags-table { width: 100%; border-collapse: collapse; }
-        .print-tags-table td { width: 50%; height: 2in; text-align: center; vertical-align: middle; border: 1px dashed #ccc; padding: 10px; box-sizing: border-box; }
-        .tag-name { font-size: 24pt; font-weight: bold; }
-        .tag-info { font-size: 14pt; }
-        .tag-seat { font-size: 16pt; font-weight: bold; }
+        .print-tags-table tr { page-break-inside: avoid; page-break-after: auto; }
+        .print-tags-table td { width: 50%; height: 2in; text-align: center; vertical-align: middle; border: 1px dashed #ccc; padding: 10px; box-sizing: border-box; page-break-inside: avoid; }
+        .tag-name { font-size: 24pt; font-weight: bold; word-wrap: break-word; }
+        .tag-info { font-size: 14pt; margin-top: 4px; }
+        .tag-seat { font-size: 16pt; font-weight: bold; margin-top: 4px; }
+        .hidden { display: none; }
       </style>
     </head><body><table class="print-tags-table">`;
     for (let i = 0; i < list.length; i += 2) {
       html += '<tr>';
       const left = list[i];
-      html += `<td>${tagHtml(left, theme)}</td>`;
+      html += `<td>${tagHtml(left, theme, printOptions)}</td>`;
       const right = list[i+1];
-      html += `<td>${right ? tagHtml(right, theme) : ''}</td>`;
+      html += `<td>${right ? tagHtml(right, theme, printOptions) : ''}</td>`;
       html += '</tr>';
     }
     html += '</table></body></html>';
@@ -366,16 +472,36 @@
     w.print();
   }
 
-  function tagHtml(student, theme) {
+  function tagHtml(student, theme, printOptions) {
     if (!student) return '';
     const bench = (student.seatId.match(/\d+/) || [''])[0];
-    const icon = theme[bench] || '';
+    const { icon, name } = getThemeItem(theme, bench);
     const letter = student.seatId.slice(-1);
     const desc = letter === 'A' ? 'Window Seat' : letter === 'B' ? 'Middle Seat' : 'Aisle Seat';
-    return `<div class="tag-name">${student.firstName} ${student.lastName}</div>
-            <div class="tag-info">Grade: ${student.grade}</div>
-            <div class="tag-info">Bus Bench: ${icon}</div>
-            <div class="tag-seat">${bench} ${desc}</div>`;
+    
+    let html = `<div class="tag-name">${student.firstName} ${student.lastName}</div>`;
+    html += `<div class="tag-info">Grade: ${student.grade}</div>`;
+    
+    // Show theme icon if enabled
+    if (printOptions.showThemeIcons && (icon || name)) {
+      const themeText = icon && name ? `${icon} ${name}` : (icon || name);
+      html += `<div class="tag-info">Bus Bench: ${themeText}</div>`;
+    }
+    
+    // Build seat info based on options
+    let seatInfo = '';
+    if (printOptions.showBenchNumbers) {
+      seatInfo = `${bench}`;
+    }
+    if (printOptions.showSeatPositions) {
+      seatInfo += (seatInfo ? ' ' : '') + desc;
+    }
+    
+    if (seatInfo) {
+      html += `<div class="tag-seat">${seatInfo}</div>`;
+    }
+    
+    return html;
   }
 
   // Human-readable description for a seatId like "7LA" without exposing A/B/C in the UI
@@ -428,10 +554,10 @@
       th, td { border: 1px solid #94a3b8; padding: 8px; font-size: 12pt; text-align: center; vertical-align: middle; }
       th { background: #e2e8f0; }
       tbody { --rows: 1; }
-      tbody tr { height: calc( (100vh - 12mm) / var(--rows) ); }
+      tbody tr { height: calc( (100vh - 12mm) / var(--rows) ); page-break-inside: avoid; page-break-after: auto; }
       .bench-label { font-weight: 800; background: #f1f5f9; }
       .aisle { background: #e2e8f0; font-weight: 800; white-space: nowrap; }
-      .seat-content { font-weight: 700; }
+      .seat-content { font-weight: 700; word-wrap: break-word; }
       .seat-grade { font-style: italic; font-size: 10pt; }
       .seat-id { font-size: 9pt; color: #475569; }
       .hidden { display: none; }
@@ -536,25 +662,35 @@ window.addEventListener('DOMContentLoaded', () => {
   // Print large bench icons (4 per page)
   function printBenchIcons() {
     const theme = THEMES[themeSelector.value] || THEMES.Default;
-    const benches = Array.from({ length: rowsCount * 2 }, (_, i) => (i + 1));
+    const benches = Array.from({ length: window.rowsCount * 2 }, (_, i) => (i + 1));
     const pages = [];
     for (let i = 0; i < benches.length; i += 4) pages.push(benches.slice(i, i + 4));
-    let html = generateBenchIconsHtml(pages, theme);
+    
+    // Read print options from checkboxes
+    const printOptions = {
+      showBenchNumbers: $('#print-show-bench-numbers')?.checked ?? true,
+      showRowNumbers: $('#print-show-row-numbers')?.checked ?? true,
+      showSeatPositions: $('#print-show-seat-positions')?.checked ?? true,
+      showThemeIcons: $('#print-show-theme-icons')?.checked ?? true
+    };
+    
+    let html = generateBenchIconsHtml(pages, theme, printOptions);
     openPrintWindow(html);
   }
   window.printBenchIcons = printBenchIcons;
 
   // Helper: Generate HTML for bench icons
-  function generateBenchIconsHtml(pages, theme) {
+  function generateBenchIconsHtml(pages, theme, printOptions) {
     const css = `
       @page { margin: 12mm; size: letter portrait; }
       body { margin: 0; font-family: system-ui, Segoe UI, Arial, "Segoe UI Emoji", "Noto Color Emoji", "Apple Color Emoji", sans-serif; }
-      .page { page-break-after: always; padding: 8mm; box-sizing: border-box; }
+      .page { page-break-after: always; padding: 8mm; box-sizing: border-box; page-break-inside: avoid; }
       .grid-2x2 { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 8mm; height: calc(100vh - 16mm); }
-      .sector { border: 1px solid #94a3b8; display: flex; align-items: center; justify-content: center; padding: 6mm; box-sizing: border-box; }
+      .sector { border: 1px solid #94a3b8; display: flex; align-items: center; justify-content: center; padding: 6mm; box-sizing: border-box; page-break-inside: avoid; }
       .card { border: 1px dashed #cbd5e1; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; text-align: center; padding: 8mm; }
       .icon { font-size: 120pt; line-height: 1; }
       .bench { margin-top: 6mm; font-size: 72pt; font-weight: 800; }
+      .hidden { display: none; }
       .cut-guides { position: fixed; inset: 0; pointer-events: none; }
       .cut-guides::before, .cut-guides::after { content: ""; position: absolute; background: #94a3b8; opacity: 0.5; }
       .cut-guides::before { width: 1px; left: 50%; top: 0; bottom: 0; }
@@ -569,11 +705,20 @@ window.addEventListener('DOMContentLoaded', () => {
         const benchNum = pageBenches[s];
         html += '<div class="sector">';
         if (benchNum) {
-          const { icon } = getThemeItem(theme, benchNum);
-          html += `<div class="card">
-                    <div class="icon">${icon || ''}</div>
-                    <div class="bench">${benchNum}</div>
-                  </div>`;
+          const { icon, name } = getThemeItem(theme, benchNum);
+          html += '<div class="card">';
+          
+          // Show icon if enabled
+          if (printOptions.showThemeIcons && icon) {
+            html += `<div class="icon">${icon}</div>`;
+          }
+          
+          // Show bench number if enabled
+          if (printOptions.showBenchNumbers) {
+            html += `<div class="bench">${benchNum}</div>`;
+          }
+          
+          html += '</div>';
         }
         html += '</div>';
       }

@@ -126,6 +126,17 @@
             <button class="print-btn bg-emerald-600 text-white rounded px-3 py-2 hover:bg-emerald-500 active:scale-[.99] transition disabled:opacity-50 text-sm touch-manipulation" id="print-tags-btn" disabled aria-label="Print name tags">Print Tags</button>
             <button class="print-btn bg-emerald-700 text-white rounded px-3 py-2 hover:bg-emerald-600 active:scale-[.99] transition disabled:opacity-50 text-sm touch-manipulation" id="print-icons-btn" disabled aria-label="Print bench icons">Print Bench Icons</button>
           </div>
+          
+          <!-- Export/Import Section -->
+          <div class="border-t border-slate-200 pt-3 mt-2 space-y-2">
+            <h3 class="text-xs font-medium text-slate-700">Save & Load</h3>
+            <button class="w-full bg-blue-600 text-white rounded px-3 py-2 hover:bg-blue-500 active:scale-[.99] transition text-sm touch-manipulation" id="export-btn" aria-label="Export seating chart">Export Seating Chart</button>
+            <label class="block">
+              <span class="sr-only">Import seating chart file</span>
+              <input type="file" id="import-file" accept=".json" class="hidden" aria-label="Import seating chart" />
+              <button type="button" class="w-full bg-blue-600 text-white rounded px-3 py-2 hover:bg-blue-500 active:scale-[.99] transition text-sm touch-manipulation" id="import-btn" aria-label="Load seating chart">Load Seating Chart</button>
+            </label>
+          </div>
         </div>
       </section>
 
