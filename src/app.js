@@ -822,6 +822,31 @@ window.addEventListener('DOMContentLoaded', () => {
     // No touchSaved: privacy-safe
   }
 
+  // Scroll hint handler for mobile
+  function setupScrollHint() {
+    const scrollHint = document.getElementById('scroll-hint');
+    const chartContainer = document.getElementById('seating-chart-container');
+    
+    if (scrollHint && chartContainer) {
+      // Hide on scroll
+      chartContainer.addEventListener('scroll', () => {
+        scrollHint.style.display = 'none';
+      }, { once: true });
+      
+      // Auto-hide after 3 seconds
+      setTimeout(() => {
+        if (scrollHint) {
+          scrollHint.style.opacity = '0';
+          scrollHint.style.transition = 'opacity 0.3s ease';
+          setTimeout(() => {
+            scrollHint.style.display = 'none';
+          }, 300);
+        }
+      }, 3000);
+    }
+  }
+
   // --- End main script ---
   init();
+  setupScrollHint();
 })();

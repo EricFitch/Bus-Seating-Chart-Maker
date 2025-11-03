@@ -35,8 +35,16 @@
       </section>
 
       <!-- Roster Input -->
-      <section id="roster-input" class="space-y-2 order-2" aria-labelledby="roster-heading">
-        <h2 id="roster-heading" class="font-semibold">Roster</h2>
+      <details class="order-2" open>
+        <summary class="font-semibold cursor-pointer select-none py-2 lg:hidden list-none">
+          <span class="inline-flex items-center gap-2">
+            <span class="arrow">▶</span>
+            📋 Roster
+            <span class="text-xs text-slate-500 font-normal">(tap to expand)</span>
+          </span>
+        </summary>
+        <h2 id="roster-heading" class="font-semibold hidden lg:block">Roster</h2>
+      <section id="roster-input" class="space-y-2" aria-labelledby="roster-heading">
         <nav aria-label="Roster input tabs" class="flex border-b border-slate-200">
           <button class="tab-button active px-3 py-2 text-sm" data-tab="upload-csv" aria-controls="upload-csv">Upload CSV</button>
           <button class="tab-button px-3 py-2 text-sm" data-tab="add-manual" aria-controls="add-manual">Add Manually</button>
@@ -61,17 +69,27 @@
           </form>
         </div>
       </section>
+      </details>
 
       <!-- Unassigned List -->
-      <section class="space-y-2 min-h-40 flex flex-col order-2" aria-labelledby="unassigned-heading">
+      <details class="order-2" open>
+        <summary class="font-semibold cursor-pointer select-none py-2 lg:hidden list-none">
+          <span class="inline-flex items-center gap-2">
+            <span class="arrow">▶</span>
+            👥 Unassigned Students
+          </span>
+        </summary>
+      <section class="space-y-2 min-h-40 flex flex-col" aria-labelledby="unassigned-heading">
         <div class="flex items-center justify-between">
-          <h3 id="unassigned-heading" class="text-sm font-medium">Unassigned Students</h3>
+          <h3 id="unassigned-heading" class="text-sm font-medium hidden lg:block">Unassigned Students</h3>
+          <h3 class="text-sm font-medium lg:hidden">Students</h3>
           <button id="sort-toggle-btn" type="button" class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-2 py-1 rounded transition" title="Toggle sort order">
             Sort: Last Name
           </button>
         </div>
         <ul id="unassignedList" class="min-h-24 bg-slate-50 border border-slate-200 rounded p-2 space-y-1 flex-1 overflow-auto" aria-label="Unassigned students list"></ul>
       </section>
+      </details>
 
       <!-- Mobile Usage Instructions -->
       <section class="lg:hidden bg-blue-50 border border-blue-200 rounded p-3 text-sm space-y-1 order-3" aria-labelledby="mobile-instructions-heading">
@@ -198,7 +216,10 @@
         </div>
 
         <!-- Seating Chart (table bench layout) -->
-        <section id="seating-chart-container" class="bg-white p-2 sm:p-4 rounded shadow-sm print:shadow-none border border-transparent overflow-x-auto" aria-label="Seating chart">
+        <section id="seating-chart-container" class="bg-white p-2 sm:p-4 rounded shadow-sm print:shadow-none border border-transparent overflow-x-auto relative" aria-label="Seating chart">
+          <div id="scroll-hint" class="lg:hidden absolute top-2 right-2 bg-blue-600 text-white text-xs px-3 py-1.5 rounded-full shadow-lg animate-pulse z-10">
+            ← Swipe to see all seats →
+          </div>
           <div class="min-w-max">
             <table id="seating-chart" class="w-full border-collapse" aria-label="Bus seating chart"></table>
           </div>

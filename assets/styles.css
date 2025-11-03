@@ -177,6 +177,36 @@ input[type="checkbox"] {
 
 /* Dark mode removed for now to keep readability consistent */
 
+/* Collapsible sections styling */
+details > summary {
+  list-style: none;
+}
+
+details > summary::-webkit-details-marker {
+  display: none;
+}
+
+details > summary .arrow {
+  display: inline-block;
+  transition: transform 0.2s ease;
+  font-size: 0.75rem;
+}
+
+details[open] > summary .arrow {
+  transform: rotate(90deg);
+}
+
+/* Hide summary on desktop - sections always expanded */
+@media (min-width: 1024px) {
+  details > summary {
+    display: none !important;
+  }
+  
+  details {
+    display: block !important;
+  }
+}
+
 /* Screen reader only content */
 .sr-only {
   position: absolute;
@@ -188,6 +218,54 @@ input[type="checkbox"] {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border-width: 0;
+}
+
+/* Toast notification animations */
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.toast {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  color: white;
+  z-index: 9999;
+  animation: slide-up 0.3s ease-out;
+  max-width: 90vw;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.toast.success {
+  background-color: #10b981;
+}
+
+.toast.info {
+  background-color: #3b82f6;
+}
+
+.toast.warning {
+  background-color: #f59e0b;
+}
+
+.toast.error {
+  background-color: #ef4444;
+}
+
+.toast.fade-out {
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 @media print {
