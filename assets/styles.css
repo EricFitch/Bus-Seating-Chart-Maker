@@ -1,4 +1,23 @@
 /* Basic tweaks beyond Tailwind and print styles */
+
+/* Ensure consistent touch targets for accessibility */
+button, 
+input[type="file"], 
+select, 
+input[type="color"],
+input[type="checkbox"] {
+  min-height: 44px;
+  touch-action: manipulation;
+}
+
+/* Larger touch targets on mobile */
+@media (max-width: 640px) {
+  button {
+    min-height: 48px;
+    font-size: 1rem;
+  }
+}
+
 /* Bench table layout overrides */
 #seating-chart {
   border-collapse: collapse;
@@ -33,7 +52,34 @@
 #seating-chart th { background-color: #f1f5f9; /* slate-100 */ }
 .bench-label { font-weight: 600; background-color: #f1f5f9; }
 .aisle { background-color: #e2e8f0; font-weight: 600; }
-.seat.empty:hover { background-color: #e2fbe8; cursor: pointer; }
+.seat.empty {
+  background: repeating-linear-gradient(
+    45deg,
+    #f8fafc,
+    #f8fafc 10px,
+    #f1f5f9 10px,
+    #f1f5f9 20px
+  ) !important;
+  border: 2px dashed #cbd5e1 !important;
+}
+
+.seat.empty .seat-content {
+  color: #94a3b8;
+  font-style: italic;
+  font-weight: 500;
+}
+
+.seat.empty:hover { 
+  background: repeating-linear-gradient(
+    45deg,
+    #e2fbe8,
+    #e2fbe8 10px,
+    #d1f5d9 10px,
+    #d1f5d9 20px
+  ) !important;
+  cursor: pointer; 
+}
+
 .seat.empty.drag-over { outline: 2px dashed #22c55e; outline-offset: -4px; background-color: #ecfdf5; }
 /* Also show drag-over for occupied to highlight swap/replace */
 .seat.drag-over { outline: 2px dashed #22c55e; outline-offset: -4px; }

@@ -308,9 +308,26 @@
   function redrawAll() {
     renderSeatingChart();
     renderUnassignedList();
+    updateSeatingStats();
     // Removed saveState for privacy: no persistent data
   }
   window.redrawAll = redrawAll;
+
+  // Update seating statistics and progress bar
+  function updateSeatingStats() {
+    const totalSeats = window.rowsCount * 2 * 6; // 2 benches × 6 seats per row (3 per side)
+    const assignedSeats = Object.keys(seatingAssignments).length;
+    const percentage = totalSeats > 0 ? (assignedSeats / totalSeats * 100).toFixed(0) : 0;
+    
+    const statsAssigned = document.getElementById('stats-assigned');
+    const statsTotal = document.getElementById('stats-total');
+    const progressBar = document.getElementById('progress-bar');
+    
+    if (statsAssigned) statsAssigned.textContent = assignedSeats;
+    if (statsTotal) statsTotal.textContent = totalSeats;
+    if (progressBar) progressBar.style.width = `${percentage}%`;
+  }
+  window.updateSeatingStats = updateSeatingStats;
 
 
   // Export/Import functionality for saving and loading seating charts
