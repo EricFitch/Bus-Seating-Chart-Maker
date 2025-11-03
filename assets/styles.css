@@ -297,22 +297,49 @@ details[open] > summary .arrow {
 .modal-list button:hover { background: #f8fafc; }
 .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px; }
 
+/* Modal button active states for better feedback */
+.modal-list button:active {
+  transform: scale(0.98);
+  background: #e2e8f0;
+}
+
+.modal-actions button:active {
+  transform: scale(0.98);
+}
+
 /* Mobile modal improvements */
 @media (max-width: 640px) {
   .modal-panel {
     width: 95vw;
     max-height: 85vh;
     margin: 16px;
+    padding: 18px;
+  }
+  
+  .modal-title {
+    font-size: 1.125rem;
+  }
+  
+  .modal-list {
+    gap: 12px;
   }
   
   .modal-list button {
-    padding: 12px 14px;
-    font-size: 0.9rem;
+    padding: 14px 16px;
+    font-size: 1rem;
+    min-height: 48px;
+  }
+  
+  .modal-actions {
+    margin-top: 16px;
+    gap: 12px;
   }
   
   .modal-actions button {
-    padding: 10px 16px;
-    font-size: 0.9rem;
+    padding: 12px 20px;
+    font-size: 1rem;
+    min-height: 44px;
+    flex: 1;
   }
 }
 
