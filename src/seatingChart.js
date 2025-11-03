@@ -1,6 +1,21 @@
 // Seating chart rendering for Bus Seating Chart Maker
 // Handles rendering of seating chart and seat cell creation
 
+// Toast notification system
+function showToast(message, type = 'success') {
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  
+  // Auto-remove after 2.5 seconds
+  setTimeout(() => {
+    toast.classList.add('fade-out');
+    setTimeout(() => toast.remove(), 300);
+  }, 2500);
+}
+window.showToast = showToast;
+
 // Create ARIA live region for screen reader announcements
 const announcer = document.createElement('div');
 announcer.setAttribute('role', 'status');
@@ -136,7 +151,9 @@ function createSeatCell(row, seatId) {
       window.seatingAssignments[draggedUuid] = seatId;
       window.selectedStudentUuid = null;
       // Announce assignment
-      announce(`${student.firstName} ${student.lastName} assigned to ${desc}`);
+      const message = `${student.firstName} ${student.lastName} assigned to ${desc}`;
+      announce(message);
+      showToast(`✅ ${student.firstName} assigned`);
       if (typeof window.redrawAll === 'function') window.redrawAll();
     });
   }

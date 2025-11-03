@@ -107,6 +107,9 @@
     $('#import-file').click();
   });
 
+  // Clear all assignments button
+  $('#clear-all-btn').addEventListener('click', clearAllAssignments);
+
   // Theme change
   themeSelector.addEventListener('change', () => {
     renderSeatingChart();
@@ -116,10 +119,29 @@
   // Helpers
 
   function populateThemeSelector() {
+    // Theme emoji previews and descriptions
+    const themeLabels = {
+      'Default': '⚪ Default (No Icons)',
+      'Animals': '🦁 Animals',
+      'Space': '🚀 Space & Astronomy',
+      'Vehicles': '🚗 Vehicles & Transport',
+      'Fruits': '🍎 Fruits & Vegetables',
+      'Colors': '🔴 Colors & Shapes',
+      'Nature': '🌳 Nature & Environment',
+      'Christmas': '🎄 Christmas Holiday',
+      'Thanksgiving': '🦃 Thanksgiving',
+      'Halloween': '🎃 Halloween',
+      'Summer': '🌞 Summer Break',
+      'SpringBreak': '🌸 Spring Break',
+      'Fall': '🍁 Fall Season',
+      'Winter': '❄️ Winter Season'
+    };
+    
     themeSelector.innerHTML = '';
     Object.keys(THEMES).forEach(name => {
       const opt = document.createElement('option');
-      opt.value = name; opt.textContent = name;
+      opt.value = name;
+      opt.textContent = themeLabels[name] || name;
       themeSelector.appendChild(opt);
     });
     // Default to Animals theme (no persistence for privacy)
@@ -207,6 +229,10 @@
   function handleCsvUpload(ev) {
     const file = ev.target.files?.[0];
     if (!file) return;
+    
+    // Show loading toast
+    showToast('⏳ Loading CSV...', 'info');
+    
     const reader = new FileReader();
     reader.onload = (e) => {
       const text = String(e.target.result || '');
@@ -214,7 +240,7 @@
       
       // Validate CSV has at least header + one data row
       if (lines.length < 2) {
-        alert('CSV must have at least a header row and one data row.');
+        showToast('❌ CSV must have at least a header row and one data row', 'error');
         ev.target.value = '';
         return;
       }
@@ -235,12 +261,14 @@
         }
       });
       
-      // Provide feedback to user
-      let message = `Imported ${imported} student(s)`;
+      // Provide feedback to user with toast
+      let message = `✅ Imported ${imported} student(s)`;
       if (skipped > 0) {
-        message += ` (skipped ${skipped} invalid row(s))`;
+        message += ` (skipped ${skipped})`;
+        showToast(message, 'warning');
+      } else {
+        showToast(message, 'success');
       }
-      alert(message);
       
       redrawAll();
       ev.target.value = '';
@@ -289,6 +317,30 @@
   }
   window.toggleSort = toggleSort;
 
+  function clearAllAssignments() {
+    // Count current assignments
+    const count = Object.keys(window.seatingAssignments).length;
+    
+    if (count === 0) {
+      showToast('ℹ️ No assignments to clear', 'info');
+      return;
+    }
+    
+    // Confirm with user
+    if (!confirm(`Clear all ${count} seat assignment(s)? This cannot be undone.`)) {
+      return;
+    }
+    
+    // Clear all assignments
+    window.seatingAssignments = {};
+    
+    // Update UI
+    renderSeatingChart();
+    updateSeatingStats();
+    showToast(`🗑️ Cleared ${count} assignment(s)`, 'success');
+  }
+  window.clearAllAssignments = clearAllAssignments;
+
   function assignSeat(seatId) {
     if (!selectedStudentUuid) { alert('Select a student from the list first.'); return; }
     seatingAssignments[selectedStudentUuid] = seatId;
@@ -308,9 +360,26 @@
   function redrawAll() {
     renderSeatingChart();
     renderUnassignedList();
+    updateSeatingStats();
     // Removed saveState for privacy: no persistent data
   }
   window.redrawAll = redrawAll;
+
+  // Update seating statistics and progress bar
+  function updateSeatingStats() {
+    const totalSeats = window.rowsCount * 2 * 6; // 2 benches × 6 seats per row (3 per side)
+    const assignedSeats = Object.keys(seatingAssignments).length;
+    const percentage = totalSeats > 0 ? (assignedSeats / totalSeats * 100).toFixed(0) : 0;
+    
+    const statsAssigned = document.getElementById('stats-assigned');
+    const statsTotal = document.getElementById('stats-total');
+    const progressBar = document.getElementById('progress-bar');
+    
+    if (statsAssigned) statsAssigned.textContent = assignedSeats;
+    if (statsTotal) statsTotal.textContent = totalSeats;
+    if (progressBar) progressBar.style.width = `${percentage}%`;
+  }
+  window.updateSeatingStats = updateSeatingStats;
 
 
   // Export/Import functionality for saving and loading seating charts
@@ -805,6 +874,31 @@ window.addEventListener('DOMContentLoaded', () => {
     // No touchSaved: privacy-safe
   }
 
+  // Scroll hint handler for mobile
+  function setupScrollHint() {
+    const scrollHint = document.getElementById('scroll-hint');
+    const chartContainer = document.getElementById('seating-chart-container');
+    
+    if (scrollHint && chartContainer) {
+      // Hide on scroll
+      chartContainer.addEventListener('scroll', () => {
+        scrollHint.style.display = 'none';
+      }, { once: true });
+      
+      // Auto-hide after 3 seconds
+      setTimeout(() => {
+        if (scrollHint) {
+          scrollHint.style.opacity = '0';
+          scrollHint.style.transition = 'opacity 0.3s ease';
+          setTimeout(() => {
+            scrollHint.style.display = 'none';
+          }, 300);
+        }
+      }, 3000);
+    }
+  }
+
   // --- End main script ---
   init();
+  setupScrollHint();
 })();

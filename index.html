@@ -35,8 +35,16 @@
       </section>
 
       <!-- Roster Input -->
-      <section id="roster-input" class="space-y-2 order-2" aria-labelledby="roster-heading">
-        <h2 id="roster-heading" class="font-semibold">Roster</h2>
+      <details class="order-2" open>
+        <summary class="font-semibold cursor-pointer select-none py-2 lg:hidden list-none">
+          <span class="inline-flex items-center gap-2">
+            <span class="arrow">▶</span>
+            📋 Roster
+            <span class="text-xs text-slate-500 font-normal">(tap to expand)</span>
+          </span>
+        </summary>
+        <h2 id="roster-heading" class="font-semibold hidden lg:block">Roster</h2>
+      <section id="roster-input" class="space-y-2" aria-labelledby="roster-heading">
         <nav aria-label="Roster input tabs" class="flex border-b border-slate-200">
           <button class="tab-button active px-3 py-2 text-sm" data-tab="upload-csv" aria-controls="upload-csv">Upload CSV</button>
           <button class="tab-button px-3 py-2 text-sm" data-tab="add-manual" aria-controls="add-manual">Add Manually</button>
@@ -61,17 +69,27 @@
           </form>
         </div>
       </section>
+      </details>
 
       <!-- Unassigned List -->
-      <section class="space-y-2 min-h-40 flex flex-col order-2" aria-labelledby="unassigned-heading">
+      <details class="order-2" open>
+        <summary class="font-semibold cursor-pointer select-none py-2 lg:hidden list-none">
+          <span class="inline-flex items-center gap-2">
+            <span class="arrow">▶</span>
+            👥 Unassigned Students
+          </span>
+        </summary>
+      <section class="space-y-2 min-h-40 flex flex-col" aria-labelledby="unassigned-heading">
         <div class="flex items-center justify-between">
-          <h3 id="unassigned-heading" class="text-sm font-medium">Unassigned Students</h3>
+          <h3 id="unassigned-heading" class="text-sm font-medium hidden lg:block">Unassigned Students</h3>
+          <h3 class="text-sm font-medium lg:hidden">Students</h3>
           <button id="sort-toggle-btn" type="button" class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-2 py-1 rounded transition" title="Toggle sort order">
             Sort: Last Name
           </button>
         </div>
         <ul id="unassignedList" class="min-h-24 bg-slate-50 border border-slate-200 rounded p-2 space-y-1 flex-1 overflow-auto" aria-label="Unassigned students list"></ul>
       </section>
+      </details>
 
       <!-- Mobile Usage Instructions -->
       <section class="lg:hidden bg-blue-50 border border-blue-200 rounded p-3 text-sm space-y-1 order-3" aria-labelledby="mobile-instructions-heading">
@@ -101,30 +119,34 @@
           </div>
           
           <!-- Print Options -->
-          <div class="bg-slate-50 border border-slate-200 rounded p-2 space-y-1">
-            <h3 class="text-xs font-medium text-slate-700">Print Options</h3>
-            <label class="flex items-center gap-2 text-xs cursor-pointer">
-              <input type="checkbox" id="print-show-bench-numbers" checked class="rounded" />
-              <span>Show bench seat numbers</span>
-            </label>
-            <label class="flex items-center gap-2 text-xs cursor-pointer">
-              <input type="checkbox" id="print-show-row-numbers" checked class="rounded" />
-              <span>Show row numbers</span>
-            </label>
-            <label class="flex items-center gap-2 text-xs cursor-pointer">
-              <input type="checkbox" id="print-show-seat-positions" checked class="rounded" />
-              <span>Show seat positions (Window/Middle/Aisle)</span>
-            </label>
-            <label class="flex items-center gap-2 text-xs cursor-pointer">
-              <input type="checkbox" id="print-show-theme-icons" checked class="rounded" />
-              <span>Show theme icons</span>
-            </label>
-          </div>
+          <details class="bg-slate-50 border border-slate-200 rounded" open>
+            <summary class="cursor-pointer p-2 text-xs font-medium text-slate-700 hover:bg-slate-100 rounded-t select-none">
+              🖨️ Print Options
+            </summary>
+            <div class="p-2 pt-0 space-y-1">
+              <label class="flex items-center gap-2 text-xs cursor-pointer">
+                <input type="checkbox" id="print-show-bench-numbers" checked class="rounded" />
+                <span>Show bench seat numbers</span>
+              </label>
+              <label class="flex items-center gap-2 text-xs cursor-pointer">
+                <input type="checkbox" id="print-show-row-numbers" checked class="rounded" />
+                <span>Show row numbers</span>
+              </label>
+              <label class="flex items-center gap-2 text-xs cursor-pointer">
+                <input type="checkbox" id="print-show-seat-positions" checked class="rounded" />
+                <span>Show seat positions (Window/Middle/Aisle)</span>
+              </label>
+              <label class="flex items-center gap-2 text-xs cursor-pointer">
+                <input type="checkbox" id="print-show-theme-icons" checked class="rounded" />
+                <span>Show theme icons</span>
+              </label>
+            </div>
+          </details>
           
           <div class="flex flex-col gap-2">
-            <button class="print-btn bg-emerald-600 text-white rounded px-3 py-2 hover:bg-emerald-500 active:scale-[.99] transition disabled:opacity-50 text-sm touch-manipulation" id="print-chart-btn" disabled aria-label="Print seating chart">Print Chart</button>
-            <button class="print-btn bg-emerald-600 text-white rounded px-3 py-2 hover:bg-emerald-500 active:scale-[.99] transition disabled:opacity-50 text-sm touch-manipulation" id="print-tags-btn" disabled aria-label="Print name tags">Print Tags</button>
-            <button class="print-btn bg-emerald-700 text-white rounded px-3 py-2 hover:bg-emerald-600 active:scale-[.99] transition disabled:opacity-50 text-sm touch-manipulation" id="print-icons-btn" disabled aria-label="Print bench icons">Print Bench Icons</button>
+            <button class="print-btn bg-emerald-600 text-white rounded-lg px-4 py-3 hover:bg-emerald-500 active:scale-[.99] transition disabled:opacity-50 text-base font-medium touch-manipulation shadow-sm" id="print-chart-btn" disabled aria-label="Print seating chart">🖨️ Print Chart</button>
+            <button class="print-btn bg-emerald-600 text-white rounded-lg px-4 py-3 hover:bg-emerald-500 active:scale-[.99] transition disabled:opacity-50 text-base font-medium touch-manipulation shadow-sm" id="print-tags-btn" disabled aria-label="Print name tags">🏷️ Print Tags</button>
+            <button class="print-btn bg-emerald-700 text-white rounded-lg px-4 py-3 hover:bg-emerald-600 active:scale-[.99] transition disabled:opacity-50 text-base font-medium touch-manipulation shadow-sm" id="print-icons-btn" disabled aria-label="Print bench icons">🎨 Print Bench Icons</button>
           </div>
           
           <!-- Export/Import Section -->
@@ -136,30 +158,31 @@
               <input type="file" id="import-file" accept=".json" class="hidden" aria-label="Import seating chart" />
               <button type="button" class="w-full bg-blue-600 text-white rounded px-3 py-2 hover:bg-blue-500 active:scale-[.99] transition text-sm touch-manipulation" id="import-btn" aria-label="Load seating chart">Load Seating Chart</button>
             </label>
+            <button class="w-full bg-red-600 text-white rounded px-3 py-2 hover:bg-red-500 active:scale-[.99] transition text-sm touch-manipulation" id="clear-all-btn" aria-label="Clear all seat assignments">🗑️ Clear All Assignments</button>
           </div>
         </div>
       </section>
 
       <!-- Grade Color Legend -->
-      <section class="space-y-2 order-5" aria-labelledby="grade-legend-heading">
-        <h2 id="grade-legend-heading" class="font-semibold">Grade Color Legend</h2>
-        <form id="grade-color-legend" class="grid grid-cols-2 gap-2 text-sm" aria-label="Grade color legend">
-          <label for="color-pk">PK <input id="color-pk" type="color" name="PK" value="#FFD966" /></label>
-          <label for="color-kg">KG <input id="color-kg" type="color" name="KG" value="#C9DAF8" /></label>
-          <label for="color-01">01 <input id="color-01" type="color" name="01" value="#D9EAD3" /></label>
-          <label for="color-02">02 <input id="color-02" type="color" name="02" value="#F4CCCC" /></label>
-          <label for="color-03">03 <input id="color-03" type="color" name="03" value="#EAD1DC" /></label>
-          <label for="color-04">04 <input id="color-04" type="color" name="04" value="#FFF2CC" /></label>
-          <label for="color-05">05 <input id="color-05" type="color" name="05" value="#D0E0E3" /></label>
-          <label for="color-06">06 <input id="color-06" type="color" name="06" value="#FDE68A" /></label>
-          <label for="color-07">07 <input id="color-07" type="color" name="07" value="#A7F3D0" /></label>
-          <label for="color-08">08 <input id="color-08" type="color" name="08" value="#FCA5A5" /></label>
-          <label for="color-09">09 <input id="color-09" type="color" name="09" value="#C4B5FD" /></label>
-          <label for="color-10">10 <input id="color-10" type="color" name="10" value="#FBCFE8" /></label>
-          <label for="color-11">11 <input id="color-11" type="color" name="11" value="#F9A8D4" /></label>
-          <label for="color-12">12 <input id="color-12" type="color" name="12" value="#A3E635" /></label>
+      <section class="space-y-3 order-5" aria-labelledby="grade-legend-heading">
+        <h2 id="grade-legend-heading" class="font-semibold text-base">🎨 Grade Color Legend</h2>
+        <form id="grade-color-legend" class="grid grid-cols-2 gap-3 text-sm" aria-label="Grade color legend">
+          <label for="color-pk" class="flex items-center gap-2 cursor-pointer"><span class="w-8 text-center font-medium">PK</span><input id="color-pk" type="color" name="PK" value="#FFD966" class="w-10 h-10 rounded cursor-pointer" /></label>
+          <label for="color-kg" class="flex items-center gap-2 cursor-pointer"><span class="w-8 text-center font-medium">KG</span><input id="color-kg" type="color" name="KG" value="#C9DAF8" class="w-10 h-10 rounded cursor-pointer" /></label>
+          <label for="color-01" class="flex items-center gap-2 cursor-pointer"><span class="w-8 text-center font-medium">01</span><input id="color-01" type="color" name="01" value="#D9EAD3" class="w-10 h-10 rounded cursor-pointer" /></label>
+          <label for="color-02" class="flex items-center gap-2 cursor-pointer"><span class="w-8 text-center font-medium">02</span><input id="color-02" type="color" name="02" value="#F4CCCC" class="w-10 h-10 rounded cursor-pointer" /></label>
+          <label for="color-03" class="flex items-center gap-2 cursor-pointer"><span class="w-8 text-center font-medium">03</span><input id="color-03" type="color" name="03" value="#EAD1DC" class="w-10 h-10 rounded cursor-pointer" /></label>
+          <label for="color-04" class="flex items-center gap-2 cursor-pointer"><span class="w-8 text-center font-medium">04</span><input id="color-04" type="color" name="04" value="#FFF2CC" class="w-10 h-10 rounded cursor-pointer" /></label>
+          <label for="color-05" class="flex items-center gap-2 cursor-pointer"><span class="w-8 text-center font-medium">05</span><input id="color-05" type="color" name="05" value="#D0E0E3" class="w-10 h-10 rounded cursor-pointer" /></label>
+          <label for="color-06" class="flex items-center gap-2 cursor-pointer"><span class="w-8 text-center font-medium">06</span><input id="color-06" type="color" name="06" value="#FDE68A" class="w-10 h-10 rounded cursor-pointer" /></label>
+          <label for="color-07" class="flex items-center gap-2 cursor-pointer"><span class="w-8 text-center font-medium">07</span><input id="color-07" type="color" name="07" value="#A7F3D0" class="w-10 h-10 rounded cursor-pointer" /></label>
+          <label for="color-08" class="flex items-center gap-2 cursor-pointer"><span class="w-8 text-center font-medium">08</span><input id="color-08" type="color" name="08" value="#FCA5A5" class="w-10 h-10 rounded cursor-pointer" /></label>
+          <label for="color-09" class="flex items-center gap-2 cursor-pointer"><span class="w-8 text-center font-medium">09</span><input id="color-09" type="color" name="09" value="#C4B5FD" class="w-10 h-10 rounded cursor-pointer" /></label>
+          <label for="color-10" class="flex items-center gap-2 cursor-pointer"><span class="w-8 text-center font-medium">10</span><input id="color-10" type="color" name="10" value="#FBCFE8" class="w-10 h-10 rounded cursor-pointer" /></label>
+          <label for="color-11" class="flex items-center gap-2 cursor-pointer"><span class="w-8 text-center font-medium">11</span><input id="color-11" type="color" name="11" value="#F9A8D4" class="w-10 h-10 rounded cursor-pointer" /></label>
+          <label for="color-12" class="flex items-center gap-2 cursor-pointer"><span class="w-8 text-center font-medium">12</span><input id="color-12" type="color" name="12" value="#A3E635" class="w-10 h-10 rounded cursor-pointer" /></label>
         </form>
-        <p class="text-xs text-slate-500">Click a color to change how seats are highlighted for each grade.</p>
+        <p class="text-xs text-slate-600 leading-relaxed">💡 Click a color to customize grade highlights</p>
       </section>
     </aside>
 
@@ -175,8 +198,33 @@
           <div class="text-sm text-slate-600">Last saved: <span id="lastSaved">never</span></div>
         </header>
 
+        <!-- Seating Status Progress Bar -->
+        <div class="no-print bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+          <div class="flex items-center justify-between text-sm mb-2">
+            <div>
+              <span class="font-semibold" id="stats-assigned">0</span> / <span id="stats-total">0</span> seats filled
+            </div>
+            <div class="flex gap-3">
+              <span class="flex items-center gap-1">
+                <span class="w-3 h-3 rounded-full bg-emerald-400"></span>
+                <span class="text-xs">Filled</span>
+              </span>
+              <span class="flex items-center gap-1">
+                <span class="w-3 h-3 rounded-full border-2 border-dashed border-slate-400 bg-slate-50"></span>
+                <span class="text-xs">Empty</span>
+              </span>
+            </div>
+          </div>
+          <div class="h-2 bg-slate-200 rounded-full overflow-hidden">
+            <div id="progress-bar" class="h-full bg-emerald-500 transition-all duration-300" style="width: 0%"></div>
+          </div>
+        </div>
+
         <!-- Seating Chart (table bench layout) -->
-        <section id="seating-chart-container" class="bg-white p-2 sm:p-4 rounded shadow-sm print:shadow-none border border-transparent overflow-x-auto" aria-label="Seating chart">
+        <section id="seating-chart-container" class="bg-white p-2 sm:p-4 rounded shadow-sm print:shadow-none border border-transparent overflow-x-auto relative" aria-label="Seating chart">
+          <div id="scroll-hint" class="lg:hidden absolute top-2 right-2 bg-blue-600 text-white text-xs px-3 py-1.5 rounded-full shadow-lg animate-pulse z-10">
+            ← Swipe to see all seats →
+          </div>
           <div class="min-w-max">
             <table id="seating-chart" class="w-full border-collapse" aria-label="Bus seating chart"></table>
           </div>
