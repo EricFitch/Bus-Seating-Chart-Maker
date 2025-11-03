@@ -119,10 +119,29 @@
   // Helpers
 
   function populateThemeSelector() {
+    // Theme emoji previews and descriptions
+    const themeLabels = {
+      'Default': '⚪ Default (No Icons)',
+      'Animals': '🦁 Animals',
+      'Space': '🚀 Space & Astronomy',
+      'Vehicles': '🚗 Vehicles & Transport',
+      'Fruits': '🍎 Fruits & Vegetables',
+      'Colors': '🔴 Colors & Shapes',
+      'Nature': '🌳 Nature & Environment',
+      'Christmas': '🎄 Christmas Holiday',
+      'Thanksgiving': '🦃 Thanksgiving',
+      'Halloween': '🎃 Halloween',
+      'Summer': '🌞 Summer Break',
+      'SpringBreak': '🌸 Spring Break',
+      'Fall': '🍁 Fall Season',
+      'Winter': '❄️ Winter Season'
+    };
+    
     themeSelector.innerHTML = '';
     Object.keys(THEMES).forEach(name => {
       const opt = document.createElement('option');
-      opt.value = name; opt.textContent = name;
+      opt.value = name;
+      opt.textContent = themeLabels[name] || name;
       themeSelector.appendChild(opt);
     });
     // Default to Animals theme (no persistence for privacy)
