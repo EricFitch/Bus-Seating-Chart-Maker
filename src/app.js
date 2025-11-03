@@ -107,6 +107,9 @@
     $('#import-file').click();
   });
 
+  // Clear all assignments button
+  $('#clear-all-btn').addEventListener('click', clearAllAssignments);
+
   // Theme change
   themeSelector.addEventListener('change', () => {
     renderSeatingChart();
@@ -207,6 +210,10 @@
   function handleCsvUpload(ev) {
     const file = ev.target.files?.[0];
     if (!file) return;
+    
+    // Show loading toast
+    showToast('⏳ Loading CSV...', 'info');
+    
     const reader = new FileReader();
     reader.onload = (e) => {
       const text = String(e.target.result || '');
@@ -214,7 +221,7 @@
       
       // Validate CSV has at least header + one data row
       if (lines.length < 2) {
-        alert('CSV must have at least a header row and one data row.');
+        showToast('❌ CSV must have at least a header row and one data row', 'error');
         ev.target.value = '';
         return;
       }
@@ -235,12 +242,14 @@
         }
       });
       
-      // Provide feedback to user
-      let message = `Imported ${imported} student(s)`;
+      // Provide feedback to user with toast
+      let message = `✅ Imported ${imported} student(s)`;
       if (skipped > 0) {
-        message += ` (skipped ${skipped} invalid row(s))`;
+        message += ` (skipped ${skipped})`;
+        showToast(message, 'warning');
+      } else {
+        showToast(message, 'success');
       }
-      alert(message);
       
       redrawAll();
       ev.target.value = '';
@@ -288,6 +297,30 @@
     renderUnassignedList();
   }
   window.toggleSort = toggleSort;
+
+  function clearAllAssignments() {
+    // Count current assignments
+    const count = Object.keys(window.seatingAssignments).length;
+    
+    if (count === 0) {
+      showToast('ℹ️ No assignments to clear', 'info');
+      return;
+    }
+    
+    // Confirm with user
+    if (!confirm(`Clear all ${count} seat assignment(s)? This cannot be undone.`)) {
+      return;
+    }
+    
+    // Clear all assignments
+    window.seatingAssignments = {};
+    
+    // Update UI
+    renderSeatingChart();
+    updateSeatingStats();
+    showToast(`🗑️ Cleared ${count} assignment(s)`, 'success');
+  }
+  window.clearAllAssignments = clearAllAssignments;
 
   function assignSeat(seatId) {
     if (!selectedStudentUuid) { alert('Select a student from the list first.'); return; }
