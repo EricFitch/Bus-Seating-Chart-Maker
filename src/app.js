@@ -365,9 +365,9 @@
   }
   window.redrawAll = redrawAll;
 
-  // Update seating statistics and progress bar
+  // Update seating stats (progress bar)
   function updateSeatingStats() {
-    const totalSeats = window.rowsCount * 2 * 6; // 2 benches × 6 seats per row (3 per side)
+    const totalSeats = window.rowsCount * 6; // Each row has 2 benches × 3 seats each = 6 seats per row
     const assignedSeats = Object.keys(seatingAssignments).length;
     const percentage = totalSeats > 0 ? (assignedSeats / totalSeats * 100).toFixed(0) : 0;
     
