@@ -4,7 +4,20 @@
 function openSeatPicker(targetSeatId) {
   const roster = Object.keys(window.allStudents)
     .filter(uuid => !Object.prototype.hasOwnProperty.call(window.seatingAssignments, uuid))
-    .map(uuid => ({ uuid, ...window.allStudents[uuid] }));
+    .map(uuid => ({ uuid, ...window.allStudents[uuid] }))
+    .sort((a, b) => {
+      if (window.sortBy === 'firstName') {
+        // Sort by first name, then last name
+        const firstNameCompare = (a.firstName || '').localeCompare(b.firstName || '');
+        if (firstNameCompare !== 0) return firstNameCompare;
+        return (a.lastName || '').localeCompare(b.lastName || '');
+      } else {
+        // Sort by last name, then first name (default)
+        const lastNameCompare = (a.lastName || '').localeCompare(b.lastName || '');
+        if (lastNameCompare !== 0) return lastNameCompare;
+        return (a.firstName || '').localeCompare(b.firstName || '');
+      }
+    });
   if (!roster.length) { alert('No unassigned students.'); return; }
 
   const root = document.getElementById('modal-root');
