@@ -20,5 +20,52 @@ const THEMES = {
 
 for (let i = 1; i <= 26; i++) THEMES.Default[i.toString()] = '';
 
+// Expose getThemeItem globally for modules
+function getThemeItem(theme, benchNum) {
+  const raw = theme[String(benchNum)] || '';
+  if (!raw) return { icon: '', name: '' };
+  if (typeof raw === 'object' && raw.icon) return raw; // future-proof if theme entries become objects
+  // Expecting format "<emoji> Name"; split on space first token
+  const m = String(raw).trim();
+  const first = m.split(' ')[0] || '';
+  const rest = m.slice(first.length).trim();
+  return { icon: first, name: rest };
+}
+
 // Export for use in app.js
 window.THEMES = THEMES;
+window.getThemeItem = getThemeItem;
+
+function populateThemeSelector() {
+  const themeSelector = window.themeSelector || document.getElementById('theme-selector');
+  if (!themeSelector) return;
+
+  // Theme emoji previews and descriptions
+  const themeLabels = {
+    'Default': '⚪ Default (No Icons)',
+    'Animals': '🦁 Animals',
+    'Space': '🚀 Space & Astronomy',
+    'Vehicles': '🚗 Vehicles & Transport',
+    'Fruits': '🍎 Fruits & Vegetables',
+    'Colors': '🔴 Colors & Shapes',
+    'Nature': '🌳 Nature & Environment',
+    'Christmas': '🎄 Christmas Holiday',
+    'Thanksgiving': '🦃 Thanksgiving',
+    'Halloween': '🎃 Halloween',
+    'Summer': '🌞 Summer Break',
+    'SpringBreak': '🌸 Spring Break',
+    'Fall': '🍁 Fall Season',
+    'Winter': '❄️ Winter Season'
+  };
+  
+  themeSelector.innerHTML = '';
+  Object.keys(THEMES).forEach(name => {
+    const opt = document.createElement('option');
+    opt.value = name;
+    opt.textContent = themeLabels[name] || name;
+    themeSelector.appendChild(opt);
+  });
+  // Default to Animals theme (no persistence for privacy)
+  themeSelector.value = 'Animals';
+}
+window.populateThemeSelector = populateThemeSelector;

@@ -175,3 +175,71 @@ function benchLabelHtml(benchNum, raw) {
 window.renderSeatingChart = renderSeatingChart;
 window.createSeatCell = createSeatCell;
 window.benchLabelHtml = benchLabelHtml;
+window.updateSeatingStats = updateSeatingStats;
+window.updatePrintButtons = updatePrintButtons;
+
+function clearAllAssignments() {
+  // Count current assignments
+  const count = Object.keys(window.seatingAssignments).length;
+  
+  if (count === 0) {
+    showToast('ℹ️ No assignments to clear', 'info');
+    return;
+  }
+  
+  // Confirm with user
+  if (!confirm(`Clear all ${count} seat assignment(s)? This cannot be undone.`)) {
+    return;
+  }
+  
+  // Clear all assignments
+  window.seatingAssignments = {};
+  
+  // Update UI
+  renderSeatingChart();
+  updateSeatingStats();
+  showToast(`🗑️ Cleared ${count} assignment(s)`, 'success');
+}
+
+function assignSeat(seatId) {
+  if (!window.selectedStudentUuid) { alert('Select a student from the list first.'); return; }
+  window.seatingAssignments[window.selectedStudentUuid] = seatId;
+  window.selectedStudentUuid = null;
+  if (typeof window.redrawAll === 'function') window.redrawAll();
+}
+
+function unassignSeat(uuid) {
+  delete window.seatingAssignments[uuid];
+  if (typeof window.redrawAll === 'function') window.redrawAll();
+}
+
+window.clearAllAssignments = clearAllAssignments;
+window.assignSeat = assignSeat;
+window.unassignSeat = unassignSeat;
+
+// Update seating stats (progress bar)
+function updateSeatingStats() {
+  const totalSeats = window.rowsCount * 6; // Each row has 2 benches × 3 seats each = 6 seats per row
+  const assignedSeats = Object.keys(window.seatingAssignments).length;
+  const percentage = totalSeats > 0 ? (assignedSeats / totalSeats * 100).toFixed(0) : 0;
+  
+  const statsAssigned = document.getElementById('stats-assigned');
+  const statsTotal = document.getElementById('stats-total');
+  const progressBar = document.getElementById('progress-bar');
+  
+  if (statsAssigned) statsAssigned.textContent = assignedSeats;
+  if (statsTotal) statsTotal.textContent = totalSeats;
+  if (progressBar) progressBar.style.width = `${percentage}%`;
+}
+
+function updatePrintButtons() {
+  const has = Object.keys(window.seatingAssignments).length > 0;
+  const printChartBtn = window.$('#print-chart-btn');
+  const printTagsBtn = window.$('#print-tags-btn');
+  const printIconsBtn = window.$('#print-icons-btn');
+
+  if (printChartBtn) printChartBtn.disabled = !has;
+  if (printTagsBtn) printTagsBtn.disabled = !has;
+  // Bench icons depend only on layout/theme, not assignments
+  if (printIconsBtn) printIconsBtn.disabled = false;
+}
